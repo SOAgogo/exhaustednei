@@ -35,9 +35,6 @@ module Util
     end
 
     def self.animal_classifier(shelter, animal_data)
-      # kind = animal_data['animal_kind']
-      # animal = Dog.new(animal_data) if kind == '狗'
-      # animal = Cat.new(animal_data) if kind == '貓'
       animal = animal_data['animal_kind'] == '狗' ? Info::Dog.new(animal_data) : Info::Cat.new(animal_data)
       Util.put_the_animal_into_shelter(shelter, animal)
       shelter

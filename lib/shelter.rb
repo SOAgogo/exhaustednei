@@ -56,12 +56,6 @@ module Info
     def initialize
       @animal_object_hash = {}
 
-      # @animal_id = data['animal_id']
-      # @animal_area_pkid = data['animal_area_pkid']
-      # @animal_shelter_pkid = data['animal_shelter_pkid']
-      # @shelter_name = data['shelter_name']
-      # @shelter_address = data['shelter_address']
-      # @shelter_tel = data['shelter_tel']
       @cat_number = 0
       @dog_number = 0
     end

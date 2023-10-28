@@ -9,9 +9,6 @@ require 'yaml'
 
 module Info
   class Cat
-    # attr_reader :animal_id, :animal_place, :animal_kind, :animal_variate,
-    #             :animal_sex, :animal_sterilization,
-    #             :animal_bacterin, :animal_bodytype, :album_file, :animal_opendate
     def initialize(data)
       @data = data
     end
@@ -58,9 +55,6 @@ module Info
   end
 
   class Dog
-    # attr_reader :animal_place, :animal_kind, :animal_variate, :animal_sex, :animal_sterilization, :animal_bacterin,
-    #             :animal_bodytype, :album_file, :animal_opendate, :animal_id
-
     def initialize(data)
       @data = data
     end

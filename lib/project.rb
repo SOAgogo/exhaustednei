@@ -78,7 +78,8 @@ module Info
     end
 
     def update_shelter(animal_data, shelter_data)
-      shelter = @shelter_list.shelter_hash[shelter_data['animal_shelter_pkid']]
+      shelter = @shelter_list.get_the_shelter(shelter_data['animal_shelter_pkid'])
+      # shelter = @shelter_list.shelter_hash[shelter_data['animal_shelter_pkid']]
       shelter = Shelter.new if shelter.nil?
       Util::Util.animal_classifier(shelter, animal_data)
     end

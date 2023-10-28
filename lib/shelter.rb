@@ -10,10 +10,14 @@ require 'yaml'
 module Info
   # class Info::ShelterList`
   class ShelterList
-    attr_accessor :shelter_hash
+    attr_reader :shelter_hash
 
     def initialize
       @shelter_hash = {}
+    end
+
+    def set_shelter_hash
+      @shelter_hash
     end
 
     def howmanyshelters
@@ -47,7 +51,7 @@ module Info
   class Shelter
     # attr_reader :animal_id, :animal_area_pkid, :animal_shelter_pkid, :shelter_name, :shelter_address, :shelter_tel
 
-    attr_accessor :animal_object_hash, :cat_number, :dog_number
+    attr_reader :animal_object_hash, :cat_number, :dog_number
 
     def initialize
       @animal_object_hash = {}
@@ -60,6 +64,18 @@ module Info
       # @shelter_tel = data['shelter_tel']
       @cat_number = 0
       @dog_number = 0
+    end
+
+    def set_animal_object_hash
+      @animal_object_hash
+    end
+
+    def set_cat_number
+      @cat_number += 1
+    end
+
+    def set_dog_number
+      @dog_number += 1
     end
 
     def animal_nums

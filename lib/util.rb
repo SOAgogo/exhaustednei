@@ -27,9 +27,9 @@ module Util
     def self.put_the_animal_into_shelter(shelter, animal_obj)
       shelter.animal_object_hash[animal_obj.animal_id] = animal_obj
       if animal_obj.animal_kind == '狗'
-        shelter.dog_number += 1
+        shelter.set_dog_number
       else
-        shelter.cat_number += 1
+        shelter.set_cat_number
       end
       shelter
     end

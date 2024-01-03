@@ -68,7 +68,7 @@ module PetAdoption
 
       def self.error_message(list_value, string)
         list_value.map do |value|
-          string += " #{value} \t"
+          string += " #{value}"
         end
         string
       end

@@ -40,16 +40,13 @@ module PetAdoption
       # GET /
       routing.root do
         session[:watching] ||= {}
-        routing.redirect '/home' if session[:watching]['session_id']
-        flash.now[:notice] = 'Welcome web page' unless session[:watching]['session_id']
+        routing.redirect '/home' if session[:watching]['name']
+        flash.now[:notice] = 'Welcome web page' unless session[:watching]['name']
 
         view('signup')
       end
 
       routing.post 'signup' do
-        # session_id = SecureRandom.uuid
-        # routing.params.merge!('session_id' => session_id)
-
         url_request = Forms::UserDataValidator.new.call(routing.params.transform_keys(&:to_sym))
         if url_request.failure?
           session[:watching] = {}
@@ -67,7 +64,6 @@ module PetAdoption
           cover_page = PetAdoption::Views::Picture.new(animal_pic.value![:cover]).cover
           view 'home', locals: { image_url: cover_page }
         rescue StandardError
-          # App.logger.error e.backtrace.join("DB can't show COVER PAGE\n")
           flash[:error] = 'Could not find the cover page.'
         end
       end
@@ -98,9 +94,11 @@ module PetAdoption
           shelter_name = URI.decode_www_form_component(shelter_name)
           animal_kind = URI.decode_www_form_component(ak_ch)
           begin
-            get_all_animals_in_shelter = Services::SelectAnimal.new.call({ animal_kind:, shelter_name: })
+            get_all_animals_in_shelter = Services::SelectAnimal.new.call({ shelter_name:,
+                                                                           animal_kind: })
 
             crawded_ratio = Services::ShelterCapacityCounter.new.call({ shelter_name: }).value![:output]
+
             view_obj = PetAdoption::Views::ChineseWordsCanBeEncoded.new(
               get_all_animals_in_shelter.value![:animal_obj_list]
             )
@@ -126,7 +124,6 @@ module PetAdoption
 
         selected_keys = %w[name email phone address]
         finder_info = session[:watching].slice(*selected_keys).transform_keys(&:to_sym)
-        # finder_info[:county] = finder_info[:address][0..1]
         finder_info[:county] = routing.params['county']
         finder_info.delete(:address)
         finder_info[:location] = "#{routing.params['location']},#{finder_info[:county]}"
@@ -157,6 +154,7 @@ module PetAdoption
           user_preference[:vaccinated] = user_preference[:vaccinated] == 'yes'
           feature_user_want_ratio = [age: 1, sterilized: 1, bodytype: 1, sex: 1, vaccinated: 1, species: 1, color: 1]
           input = [routing.params['animalId'].to_i, user_preference, feature_user_want_ratio]
+          binding.pry
 
           response = Services::PickAnimalByOriginID.new.call({ input: })
 
@@ -174,6 +172,7 @@ module PetAdoption
         user_preference['county'] = county if routing.params['searchcounty'] == 'yes'
 
         input = [user_preference, routing.params]
+
         output = Services::PromoteUserAnimals.new.call(input)
         prefer_animals = output.value![:sorted_animals]
 
@@ -215,19 +214,6 @@ module PetAdoption
       rescue StandardError
         flash[:error] = 'Sorry, in this moment, there is no lossing pet nearby you'
         routing.redirect '/missing'
-      end
-
-      routing.on 'shelter_statistics' do
-        routing.is do
-          # stats_output = Services::ShelterStatistics.new.call
-          shelter = PetAdoption::ShelterInfo::ShelterInfoMapper.new('臺中市動物之家南屯園區').build_entity
-
-          output = { 'sterilization' => shelter.count_num_sterilizations,
-                     'no_sterilizations' => shelter.count_num_no_sterilizations,
-                     'for_bacterin' => shelter.count_num_animal_bacterin,
-                     'no_bacterin' => shelter.count_num_animal_no_bacterin }
-          view 'shelter_info', locals: { output: }
-        end
       end
     end
   end

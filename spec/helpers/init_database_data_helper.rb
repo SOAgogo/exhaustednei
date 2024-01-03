@@ -5,7 +5,7 @@ require_relative '../../app/domain/promote_animals_to_users/mappers/animal_shelt
 require_relative '../../app/domain/promote_animals_to_users/mappers/animal_mapper'
 require_relative '../../app/domain/promote_animals_to_users/mappers/shelter_mapper'
 require_relative '../../app/domain/promote_animals_to_users/repositories/for'
-require 'pry'
+
 module Repository
   module App
     # init_database for initializing database

@@ -3,36 +3,39 @@
 module PetAdoption
   module Services
     # class PickAnimalInfo`
-    class PickAnimalCover
-      include Dry::Transaction
-
-      step :pick_animal_cover
-
-      def pick_animal_cover
-        cover = Repository::Animals.web_page_cover
-        Success(cover:)
-      rescue StandardError => e
-        Failure(e.message)
-      end
-    end
 
     # class SelectAnimal`
     class SelectAnimal
       include Dry::Transaction
 
+      step :validate_input
       step :select_animal
+      step :reify_animal
 
       private
 
-      def select_animal(input)
-        animal_obj_list = PetAdoption::Repository::Animals
-          .select_animal_by_shelter_name_kind(input[:animal_kind],
-                                              input[:shelter_name])
+      def validate_input(input)
+        if input.success?
+          Success(input)
+        else
+          Failure(input.errors.to_h)
+        end
+      end
 
-        animal_obj_list = animal_obj_list.values
-        Success(animal_obj_list:)
-      rescue StandardError => e
-        Failure(e.message)
+      def select_animal(input)
+        animal_obj_list = Gateway::Api.new(PetAdoption::App.config)
+          .get_all_animals_in_shelter(input[:animal_kind], input[:shelter_name])
+
+        Success(animal_obj_list)
+      rescue StandardError
+        Failure('cant find any animal in this shelter')
+      end
+
+      def reify_animal(results)
+        animals = Representer::ShelterAnimals.new(OpenStruct.new).from_json(results.payload)
+        Success(animals)
+      rescue StandardError
+        Failure('Error in parsing animals')
       end
     end
 
@@ -40,37 +43,40 @@ module PetAdoption
     class PickAnimalByOriginID
       include Dry::Transaction
 
-      step :select_animal
-      step :create_animal
-      step :calculate_similarity
+      step :validate_input
+      step :modify_input
+      step :create_similarity
+      step :reify_similarity
 
       private
 
-      def select_animal(input)
-        animal_obj = PetAdoption::Repository::Animals
-          .find_animal(input[:input][0])
+      def validate_input(input)
+        if input.success?
+          Success(input)
+        else
+          Failure(input.errors.to_h)
+        end
+      end
 
-        input = [animal_obj, input[:input][1], input[:input][2]]
+      def modify_input(input)
+        input = input.to_h.transform_keys(&:to_s).except('name', 'email', 'phone', 'address')
         Success(input:)
-      rescue StandardError => e
-        Failure(e.message)
       end
 
-      def create_animal(input)
-        animal_obj, creation_or_not = PetAdoption::Mapper::AnimalMapper.find(input[:input][0])
-        Failure('your animal information cant be created') unless creation_or_not
-        input = [animal_obj, input[:input][1], input[:input][2]]
-        Success(input:) if creation_or_not
-      rescue StandardError => e
-        Failure(e.message)
+      def create_similarity(input)
+        animal_similarity = Gateway::Api.new(PetAdoption::App.config)
+          .count_animal_score(input[:input])
+
+        Success(animal_similarity)
+      rescue StandardError
+        Failure('Error in counting scores')
       end
 
-      def calculate_similarity(input)
-        animal_obj = input[:input][0]
-        score = animal_obj.similarity_checking(input[:input][1], input[:input][2][0])
-        Success(score:)
-      rescue StandardError => e
-        Failure(e.message)
+      def reify_similarity(results)
+        scores = Representer::AnimalScore.new(OpenStruct.new).from_json(results.payload)
+        Success(scores)
+      rescue StandardError
+        Failure('Error in parsing scores')
       end
     end
 
@@ -78,27 +84,69 @@ module PetAdoption
     class ShelterCapacityCounter
       include Dry::Transaction
 
-      step :create_shelter
-      step :calculate_capacity_ratio
+      step :validate_input
+      step :shelter_capacity
+      step :reify_crowdedness
 
       private
 
-      def create_shelter(input)
-        shelter_obj = Repository::Shelters.find_shelter_by_name(input[:shelter_name])
+      def validate_input(input)
+        if input.success?
+          Success(input)
+        else
+          Failure(input.errors.to_h)
+        end
+      end
 
-        Success(shelter_obj:)
+      def shelter_capacity(input)
+        shelter_obj = Gateway::Api.new(PetAdoption::App.config)
+          .shelter_crowdedness(input[:shelter_name])
+
+        Success(shelter_obj)
       rescue StandardError => e
         Failure(e.message)
       end
 
-      def calculate_capacity_ratio(input)
-        capacity_ratio = input[:shelter_obj].capacity_ratio
-        old_animal_num = input[:shelter_obj].shelter_stats.stay_too_long_animals
-        severity = input[:shelter_obj].shelter_stats.severity_of_old_animals
-        output = [capacity_ratio, old_animal_num, severity]
-        Success(output:)
-      rescue StandardError => e
-        Failure(e.message)
+      def reify_crowdedness(results)
+        crowdedness = Representer::ShelterCrowdedness.new(OpenStruct.new).from_json(results.payload)
+        Success(crowdedness)
+      rescue StandardError
+        Failure('Error in parsing metrics')
+      end
+    end
+
+    # class NumberOfOldAnimals`
+    class NumberOfOldAnimals
+      include Dry::Transaction
+
+      step :validate_input
+      step :number_of_old_animals
+      step :reify_old_animals
+
+      private
+
+      def validate_input(input)
+        if input.success?
+          Success(input)
+        else
+          Failure(input.errors.to_h)
+        end
+      end
+
+      def number_of_old_animals(input)
+        old_animals = Gateway::Api.new(PetAdoption::App.config)
+          .number_of_old_animals(input[:shelter_name])
+
+        Success(old_animals)
+      rescue StandardError
+        Failure('Error in parsing metrics')
+      end
+
+      def reify_old_animals(results)
+        old_animals = Representer::ShelterTooOldAnimals.new(OpenStruct.new).from_json(results.payload)
+        Success(old_animals)
+      rescue StandardError
+        Failure('Error in parsing metrics')
       end
     end
   end

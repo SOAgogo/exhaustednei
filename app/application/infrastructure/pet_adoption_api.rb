@@ -56,16 +56,16 @@ module PetAdoption
           call_api('get')
         end
 
-        def shelter_crowdedness(shelter_name)
+        def get_shelter_crowdedness(shelter_name)
           call_api('get', ['shelters', 'crowdedness', shelter_name])
         end
 
         def get_number_of_old_animals(shelter_name)
-          call_api('get', ['shelters', 'old-animals', shelter_name])
+          call_api('get', ['shelters', 'oldanimals', shelter_name])
         end
 
         def get_all_animals_in_shelter(animal_kind, shelter_name)
-          call_api('get', ['shelters'], animal_kind, shelter_name)
+          call_api('get', ['shelters', animal_kind, shelter_name])
         end
 
         def recommend_some_vets(user_preference)

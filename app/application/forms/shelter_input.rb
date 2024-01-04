@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'dry-validation'
+require 'pry'
 
 module PetAdoption
   module Forms
@@ -12,11 +13,11 @@ module PetAdoption
       end
 
       rule(:animal_kind) do
-        key.failure('must be dog or cat') unless value == 'dog' && value == 'cat'
+        key.failure('must be dog or cat') unless value == '狗' || value == '貓'
       end
 
       rule(:shelter_name) do
-        key.failure('must be a valid Taiwan county') unless value.nil?
+        key.failure('must be a valid Taiwan county') if value.nil?
       end
     end
   end

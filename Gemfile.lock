@@ -181,9 +181,13 @@ GEM
       parser (~> 3.2.0)
       rainbow (>= 2.0, < 4.0)
     regexp_parser (2.8.2)
+    representable (2.3.0)
+      uber (~> 0.0.7)
     rerun (0.14.0)
       listen (~> 3.0)
     rexml (3.2.6)
+    roar (1.0.4)
+      representable (>= 2.0.1, < 2.4.0)
     roda (3.74.0)
       rack
     rubocop (1.57.2)
@@ -231,6 +235,7 @@ GEM
       date
     tzinfo (1.2.11)
       thread_safe (~> 0.1)
+    uber (0.0.15)
     unicode-display_width (2.5.0)
     uri (0.13.0)
     vcr (6.2.0)
@@ -277,6 +282,7 @@ DEPENDENCIES
   rake (~> 13.0)
   reek
   rerun (~> 0.0)
+  roar (~> 1.0.0)
   roda (~> 3.0)
   rubocop (~> 1.0)
   selenium-webdriver (~> 4.11)

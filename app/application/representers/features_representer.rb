@@ -22,12 +22,7 @@ module PetAdoption
       property :bodytype
       property :image_url
       property :registration_date
-
-      private
-
-      def origin_id
-        represented.origin_id
-      end
+      property :links
     end
   end
 end

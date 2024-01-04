@@ -7,41 +7,41 @@ div.gallery {
   li
   | Shelter information:
   ul
-    li How crowded  is this shelter(animal number divided by maximum commodations): #{crawded_ratio[0].to_s}
-    li How many old animals live here(stayed over 150 days): #{crawded_ratio[1].to_s}
-    li Are there too many old animals living here? #{crawded_ratio[2].to_s}
+    li How crowded  is this shelter(animal number divided by maximum commodations): #{view_crawded_ratio.value.to_s}
+    li How many old animals live here(stayed over 150 days): #{view_old_animal_num.old_animal_num}
+    li Too many old animals live here? Extent: #{view_old_animal_num.serverity}
   div.gallery
-      - view_obj.animal_obj_list.each do |obj| 
+      - view_animals.transform.each do |obj| 
         .row
           .column
             .card
               .card-content
-                img[src="#{obj['image_url']}" class="img-thumbnail" alt="Cinque Terre" width = 200 height = 200]
+                img[src="#{obj[:image_url]}" class="img-thumbnail" alt="Cinque Terre" width = 200 height = 200]
               .card-content
                 .container
                   h4
-                    | "#{obj['species']}"
+                    | "#{obj[:species]}"
                   p.title
-                    | Id : "#{obj['origin_id'].to_s}"
+                    | Id : "#{obj[:origin_id].to_s}"
                   p
-                    | Color : "#{obj['color']}"
+                    | Color : "#{obj[:color]}"
                   p
-                    | Sex : "#{obj['sex']}"
+                    | Sex : "#{obj[:sex]}"
                   p
-                    | Age : "#{obj['animal_age']}"
+                    | Age : "#{obj[:animal_age]}"
                   p 
-                    | Sterilization : "#{obj['sterilized']}"
+                    | Sterilization : "#{obj[:sterilized]}"
                   p 
-                    | Vaccinated : "#{obj['vaccinated']}"
+                    | Vaccinated : "#{obj[:vaccinated]}"
                   p 
-                    | BodyType : "#{obj['bodytype']}"
+                    | BodyType : "#{obj[:bodytype]}"
                   p 
-                    | RegisterDate : "#{obj['registration_date']}"
+                    | RegisterDate : "#{obj[:registration_date]}"
                   p
-                    button.button type="button" class="count-point-btn" data-animal-id="#{obj['origin_id'].to_s}" onclick="sendAnimalScoreRequest(#{obj['origin_id'].to_s})"
+                    button.button type="button" class="count-point-btn" data-animal-id="#{obj[:origin_id].to_s}" onclick="sendAnimalScoreRequest(#{obj[:origin_id].to_s})"
                       | Count the score of the animal
                     
-                    p class="card-text" id="#{obj['origin_id'].to_s}"
+                    p class="card-text" id="#{obj[:origin_id].to_s}"
                       
 
 javascript:
@@ -52,8 +52,9 @@ javascript:
       data: { animalId: animalId },
       dataType: 'json',
       success: function(response) {
-        console.log('score ', response.score);
-        $('#' + animalId).text('How many features which matches your preference: ' + response.score);
+        console.log('score ', response.scores);
+        //console.log('score ', response);
+        $('#' + animalId).text('How many features which matches your preference: ' + response.scores);
       },
       error: function(error) {
         console.error('Error:', error);

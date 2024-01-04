@@ -45,13 +45,18 @@ task :respec do
   sh "rerun -c 'rake spec' --ignore 'coverage/*'"
 end
 
-desc 'Run web app in default mode'
-task run: ['run:default']
+desc 'Run the application (default: development mode)'
+task run: ['run:dev']
 
 namespace :run do
-  desc 'Run web app in development or production'
-  task :default do
-    sh 'bundle exec puma'
+  desc 'Run the application in development mode'
+  task :dev do
+    sh "rerun -c --ignore 'coverage/*'  -- bundle exec puma"
+  end
+
+  desc 'Run the application in test mode'
+  task :test do
+    sh "rerun -c --ignore 'coverage/*' -- bundle exec puma -p 9000"
   end
 end
 

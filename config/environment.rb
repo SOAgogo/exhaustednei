@@ -37,9 +37,12 @@ module PetAdoption
       @db = Sequel.connect(ENV.fetch('DATABASE_URL'))
       def self.db = @db # rubocop:disable Style/TrivialAccessors
 
+      # Logger Setup
       @logger = Logger.new($stderr)
-      class << self
-        attr_reader :logger
+      def self.logger = @logger # rubocop:disable Style/TrivialAccessors
+
+      configure :development, :test, :app_test do
+        require 'pry'; # for breakpoints
       end
     end
   end

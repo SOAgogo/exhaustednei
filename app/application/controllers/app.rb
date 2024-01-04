@@ -60,9 +60,7 @@ module PetAdoption
 
       routing.on 'home' do
         routing.is do
-          animal_pic = Services::PickAnimalCover.new.call
-          cover_page = PetAdoption::Views::Picture.new(animal_pic.value![:cover]).cover
-          view 'home', locals: { image_url: cover_page }
+          view 'home'
         rescue StandardError
           flash[:error] = 'Could not find the cover page.'
         end
@@ -93,18 +91,20 @@ module PetAdoption
 
           shelter_name = URI.decode_www_form_component(shelter_name)
           animal_kind = URI.decode_www_form_component(ak_ch)
+          shelter_selector = Forms::ShelterSelector.new.call({ animal_kind:, shelter_name: })
+
           begin
-            get_all_animals_in_shelter = Services::SelectAnimal.new.call({ shelter_name:,
-                                                                           animal_kind: })
+            get_all_animals_in_shelter = Services::SelectAnimal.new.call(shelter_selector)
+            crawded_ratio = Services::ShelterCapacityCounter.new.call(shelter_selector)
+            old_animal_num = Services::NumberOfOldAnimals.new.call(shelter_selector)
+            view_animals = PetAdoption::Views::AnimalInShelter.new(get_all_animals_in_shelter)
+            view_crawded_ratio = PetAdoption::Views::ShelterCrowdedness.new(crawded_ratio)
+            view_old_animal_num = PetAdoption::Views::Serverity.new(old_animal_num)
 
-            crawded_ratio = Services::ShelterCapacityCounter.new.call({ shelter_name: }).value![:output]
-
-            view_obj = PetAdoption::Views::ChineseWordsCanBeEncoded.new(
-              get_all_animals_in_shelter.value![:animal_obj_list]
-            )
             view 'project', locals: {
-              view_obj:,
-              crawded_ratio:,
+              view_animals:,
+              view_crawded_ratio:,
+              view_old_animal_num:,
               shelter_name:
             }
           rescue StandardError
@@ -113,6 +113,22 @@ module PetAdoption
             routing.redirect '/home'
           end
         end
+      end
+
+      routing.post 'user/count-animal-score' do
+        routing.is do
+          params = session[:watching].merge('animal_id' => routing.params['animalId'])
+
+          user_preference = Forms::UserPreference.new.call(params.transform_keys(&:to_sym))
+
+          response = Services::PickAnimalByOriginID.new.call(user_preference)
+
+          view_obj = Views::ScoreForAnimal.new(response)
+
+          return view_obj.value.to_json
+        end
+      rescue StandardError
+        flash[:error] = 'Could not count the score.'
       end
 
       routing.on 'found' do
@@ -131,6 +147,8 @@ module PetAdoption
         finder_info[:number] = routing.params['number'].to_i
         finder_info[:distance] = routing.params['distance'].to_i
 
+        binding.pry
+
         res = Services::FinderUploadImages.new.call({ finder_info: })
 
         instructions = PetAdoption::Views::TakeCareInfo.new(res.value![:finder])
@@ -144,24 +162,6 @@ module PetAdoption
 
       routing.on 'adopt' do
         view 'adopt'
-      end
-
-      routing.post 'user/count-animal-score' do
-        routing.is do
-          selected_keys = %w[name email phone address birthdate]
-          user_preference = session[:watching].except(*selected_keys).transform_keys(&:to_sym)
-          user_preference[:sterilized] = user_preference[:sterilized] == 'yes'
-          user_preference[:vaccinated] = user_preference[:vaccinated] == 'yes'
-          feature_user_want_ratio = [age: 1, sterilized: 1, bodytype: 1, sex: 1, vaccinated: 1, species: 1, color: 1]
-          input = [routing.params['animalId'].to_i, user_preference, feature_user_want_ratio]
-          binding.pry
-
-          response = Services::PickAnimalByOriginID.new.call({ input: })
-
-          return response.value!
-        end
-      rescue StandardError
-        flash[:error] = 'Could not count the score.'
       end
 
       routing.post 'promote-user-animals' do

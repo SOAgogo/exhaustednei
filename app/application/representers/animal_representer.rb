@@ -10,7 +10,7 @@ module PetAdoption
     class Animal < Roar::Decorator
       include Roar::JSON
 
-      property :animal, extend: Representer::AnimalFeatures, class: Struct
+      property :animal, extend: Representer::AnimalFeatures, class: OpenStruct
     end
   end
 end

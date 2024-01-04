@@ -20,6 +20,7 @@ gem 'execjs'
 gem 'puma', '~> 6.0'
 gem 'rack-session', '~> 0.3'
 gem 'roda', '~> 3.0'
+gem 'roar', '~> 1.0.0'
 
 # Controllers and services
 gem 'dry-monads', '~> 1.4'

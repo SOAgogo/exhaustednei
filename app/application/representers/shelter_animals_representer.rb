@@ -12,7 +12,7 @@ module PetAdoption
     class ShelterAnimals < Roar::Decorator
       include Roar::JSON
 
-      collection :animal_obj_list, extend: Representer::Animal, class: Struct
+      collection :animal_obj_list, extend: Representer::Animal, class: OpenStruct
     end
   end
 end

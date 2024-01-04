@@ -5,7 +5,7 @@ require 'dry-validation'
 module PetAdoption
   module Forms
     # Form validation for Github project URL
-    class UserDataValidator < Dry::Validation::Contract
+    class UserPreference < Dry::Validation::Contract
       params do
         required(:name).filled(:string)
         required(:email).filled(:string)
@@ -18,6 +18,7 @@ module PetAdoption
         required(:bodytype).filled(:string)
         required(:species).filled(:string)
         required(:color).filled(:string)
+        required(:animal_id).filled(:string)
       end
 
       EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i

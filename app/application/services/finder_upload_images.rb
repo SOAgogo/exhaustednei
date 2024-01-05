@@ -25,6 +25,7 @@ module PetAdoption
 
       def upload_image(input)
         file_path = input['file']
+        puts file_path
         puts 'file path exists'
         s3 = PetAdoption::Storage::S3.new
         puts 's3 object created'

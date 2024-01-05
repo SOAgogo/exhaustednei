@@ -17,7 +17,6 @@ module PetAdoption
       def validate_input(input)
         if input.success?
           input = input.to_h.transform_keys(&:to_s)
-          puts 'input correct!!!!!'
           Success(input)
         else
           Failure(input.errors.to_h)
@@ -26,10 +25,15 @@ module PetAdoption
 
       def upload_image(input)
         file_path = input['file']
+        puts 'file path exists'
         s3 = PetAdoption::Storage::S3.new
+        puts 's3 object created'
         base_url, object = PetAdoption::Storage::S3.object_url(file_path)
+        puts 'set base url and object'
         PetAdoption::Storage::S3.upload_image_to_s3(file_path)
+        puts 'upload image to s3'
         s3.make_image_public(object)
+        puts 'make image public'
         input['file'] = "#{base_url}/#{object}"
         puts "#{base_url}/#{object}"
 

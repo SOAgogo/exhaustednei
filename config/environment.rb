@@ -34,8 +34,8 @@ module PetAdoption
         expire_after: 60
       }
       # Database Setup
-      @db = Sequel.connect(ENV.fetch('DATABASE_URL'))
-      def self.db = @db # rubocop:disable Style/TrivialAccessors
+      # @db = Sequel.connect(ENV.fetch('DATABASE_URL'))
+      # def self.db = @db
 
       # Logger Setup
       # @logger = Logger.new($stderr)

@@ -94,7 +94,7 @@ module PetAdoption
         def call_api(method, resources = [], params = {})
           api_path = resources.empty? ? @api_host : @api_root
           url = [api_path, resources].flatten.join('/') + params_str(params)
-          puts url
+          # puts url
           HTTP.headers('Accept' => 'application/json').send(method, url)
             .then { |http_response| Response.new(http_response) }
         rescue StandardError

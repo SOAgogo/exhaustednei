@@ -197,7 +197,7 @@ module PetAdoption
 
         keeper_preference = Forms::KeeperInputsValidator.new.call(keeper_info)
 
-        puts 'keeper_preference'
+        # puts 'keeper_preference'
         res = Services::KeeperUploadImages.new.call(keeper_preference)
 
         information = PetAdoption::Views::LossingPets.new(res.value!)

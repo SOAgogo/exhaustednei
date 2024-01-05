@@ -163,23 +163,20 @@ module PetAdoption
       end
 
       routing.post 'promote-user-animals' do
-        keys_to_exclude = %w[name email phone birthdate address]
+        keys_to_exclude = %w[name email phone address]
         user_preference = session[:watching].except(*keys_to_exclude)
-        county = session[:watching]['address'][0..2]
+        ratio = routing.params.transform_keys { |key| "ratio_#{key}" }
+        input = user_preference.merge(ratio)
+        input = input.transform_keys { |key| key == 'ratio_top' ? 'top' : key }
+        req = Forms::RecommendInputsValidator.new.call(input)
 
-        user_preference['county'] = county if routing.params['searchcounty'] == 'yes'
-
-        input = [user_preference, routing.params]
-
-        output = Services::PromoteUserAnimals.new.call(input)
-        prefer_animals = output.value![:sorted_animals]
-
+        output = Services::PromoteUserAnimals.new.call(req)
         if output.failure?
           flash[:error] = 'Recommendation failed, please try again.'
           routing.redirect '/adopt'
         end
 
-        output_view = PetAdoption::Views::AnimalPromotion.new(prefer_animals)
+        output_view = PetAdoption::Views::PromoteUserAnimals.new(output.value!)
 
         view 'recommendation', locals: { output: output_view }
       end

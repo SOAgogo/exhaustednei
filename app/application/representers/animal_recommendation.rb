@@ -11,8 +11,8 @@ module PetAdoption
       include Roar::JSON
 
       property :shelter_name
-      property :recommend_animal, extend: Representer::Animal, class: Struct
-      property :scores, extend: Representer::AnimalScore, class: Struct
+      property :recommend_animal, extend: Representer::Animal, class: OpenStruct
+      property :scores, extend: Representer::AnimalScore, class: OpenStruct
     end
   end
 end

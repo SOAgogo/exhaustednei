@@ -80,6 +80,10 @@ module PetAdoption
           call_api('post', %w[keeper contact-finders], keeper_info)
         end
 
+        def promote_user_animals(user_preference)
+          call_api('post', %w[promote-user-animals], user_preference)
+        end
+
         private
 
         def params_str(params)

@@ -10,7 +10,7 @@ module PetAdoption
     class AllAnimalRecommendation < Roar::Decorator
       include Roar::JSON
 
-      collection :recommendation, extend: Representer::AnimalRecommendation, class: Struct
+      collection :recommendation, extend: Representer::AnimalRecommendation, class: OpenStruct
     end
   end
 end

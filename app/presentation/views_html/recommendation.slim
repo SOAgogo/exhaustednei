@@ -4,40 +4,39 @@ div.gallery {
 h3 your recommedation lists
 body
   div.gallery
-      - output.prefer_animals.each do |shelter,animal| 
+      - output.prefer_animals.each do |animal| 
         .row 
         .column 
             legend
-                | #{shelter}
-        - animal.each do |obj|
+                | #{animal[0]}
             .row
             .column
                 .card
                 .card-content
-                    img[src="#{obj['image_url']}" class="img-thumbnail" alt="Cinque Terre" width = 200 height = 200]
+                    img[src="#{animal[1]['image_url']}" class="img-thumbnail" alt="Cinque Terre" width = 200 height = 200]
                 .card-content
                     .container
                     h4
-                        | "#{obj['species']}"
+                        | "#{animal[1]['species']}"
                     p.title
-                        | Id : "#{obj['origin_id'].to_s}"
+                        | Id : "#{animal[1]['origin_id'].to_s}"
                     p
-                        | Color : "#{obj['color']}"
+                        | Color : "#{animal[1]['color']}"
                     p
-                        | Sex : "#{obj['sex']}"
+                        | Sex : "#{animal[1]['sex']}"
                     p
-                        | Age : "#{obj['age']}"
+                        | Age : "#{animal[1]['age']}"
                     p 
-                        | Sterilization : "#{obj['sterilized']}"
+                        | Sterilization : "#{animal[1]['sterilized']}"
                     p 
-                        | Vaccinated : "#{obj['vaccinated']}"
+                        | Vaccinated : "#{animal[1]['vaccinated']}"
                     p 
-                        | BodyType : "#{obj['bodytype']}"
+                        | BodyType : "#{animal[1]['bodytype']}"
                     p 
-                        | RegisterDate : "#{obj['registration_date']}"
+                        | RegisterDate : "#{animal[1]['registration_date']}"
 
                     p.lead 
-                        | Score : #{obj['score'].to_s}
+                        | Score : #{animal[2].to_s}
                     
             
             

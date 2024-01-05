@@ -5,10 +5,23 @@ module PetAdoption
   module Views
     # View for a vets
     class Clinic
-      attr_reader :clinic
-
       def initialize(result)
-        @clinic = result.vet_info.vet_info
+        @clinics = result.value!.clinics
+      end
+
+      def clinics # rubocop:disable Metrics/MethodLength
+        @clinics.map do |clinic|
+          {
+            name: clinic.name,
+            address: clinic.address,
+            open_time: clinic.open_time,
+            rating: clinic.rating,
+            total_ratings: clinic.total_ratings,
+            which_road: clinic.which_road,
+            latitude: clinic.latitude,
+            longitude: clinic.longitude
+          }
+        end
       end
     end
 
@@ -17,7 +30,7 @@ module PetAdoption
       attr_reader :instruction
 
       def initialize(result)
-        @instruction = result.take_care_info.instruction
+        @instruction = result.value!.take_care_info
       end
     end
   end

@@ -41,8 +41,8 @@ module PetAdoption
         @request.promote_user_animals(user_preference)
       end
 
-      def contact_fider(keeper_info)
-        @request.contact_fider(keeper_info)
+      def contact_finders(keeper_info)
+        @request.contact_finders(keeper_info)
       end
 
       # HTTP request transmitter
@@ -76,8 +76,8 @@ module PetAdoption
           call_api('post', %w[user count-animal-score], user_preference)
         end
 
-        def contact_fider(keeper_info)
-          call_api('post', %w[finder contact-fider], keeper_info)
+        def contact_finders(keeper_info)
+          call_api('post', %w[keeper contact-finders], keeper_info)
         end
 
         private

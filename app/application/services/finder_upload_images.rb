@@ -7,52 +7,47 @@ module PetAdoption
     # class ImageRecognition`
     class FinderUploadImages
       include Dry::Transaction
-      step :create_finder_mapper
+      step :validate_input
       step :upload_image
-      step :store_upload_record
       step :find_the_vets
+      step :reify_vets
 
       private
 
-      def create_finder_mapper(input)
-        finder_mapper = PetAdoption::LossingPets::FinderMapper.new(
-          input[:finder_info].except(:location, :file, :number, :distance),
-          input[:finder_info][:location]
-        )
-        input = [finder_mapper, input[:finder_info][:file], input[:finder_info][:number],
-                 input[:finder_info][:distance]]
-        Success(input:)
-      rescue StandardError => e
-        Failure(e.message)
+      def validate_input(input)
+        if input.success?
+          input = input.to_h.transform_keys(&:to_s)
+          Success(input)
+        else
+          Failure(input.errors.to_h)
+        end
       end
 
       def upload_image(input)
-        finder_mapper = input[:input][0]
-        finder_mapper.upload_image(input[:input][1])
-        input = [finder_mapper, input[:input][2], input[:input][3]]
-        Success(input:)
-      rescue StandardError => e
-        Failure(e.message)
-      end
+        file_path = input['file']
+        s3 = PetAdoption::Storage::S3.new
+        base_url, object = PetAdoption::Storage::S3.object_url(file_path)
+        PetAdoption::Storage::S3.upload_image_to_s3(file_path)
+        s3.make_image_public(object)
+        input['file'] = "#{base_url}/#{object}"
 
-      def store_upload_record(input)
-        finder_mapper = input[:input][0]
-        finder_mapper.store_user_info
-        input = [finder_mapper, input[:input][1], input[:input][2]]
         Success(input:)
       rescue StandardError => e
         Failure(e.message)
       end
 
       def find_the_vets(input)
-        finder_mapper = input[:input][0]
-
-        finder = finder_mapper.build_entity(input[:input][2], input[:input][1])
-        raise StandardError, 'Sorry, in this moment, there is no vet nearby you' if finder.vet_info.vet_info.empty?
-
-        Success(finder:)
+        res = PetAdoption::Gateway::Api.new(PetAdoption::App.config).recommend_some_vets(input[:input])
+        Success(res)
       rescue StandardError
         Failure('Sorry, in this moment, there is no vet nearby you')
+      end
+
+      def reify_vets(results)
+        vets = Representer::VetRecommeandation.new(OpenStruct.new).from_json(results.payload)
+        Success(vets)
+      rescue StandardError
+        Failure('Error in parsing vets')
       end
     end
   end

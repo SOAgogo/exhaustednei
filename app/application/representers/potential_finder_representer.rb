@@ -6,7 +6,7 @@ module PetAdoption
     class PotentialFinderRepresenter < Roar::Decorator
       include Roar::JSON
 
-      collection :finders, extend: FinderInfoRepresenter, class: Struct
+      collection :finders, extend: FinderInfoRepresenter, class: OpenStruct
     end
   end
 end

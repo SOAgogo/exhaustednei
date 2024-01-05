@@ -7,54 +7,49 @@ module PetAdoption
     # class ImageRecognition`
     class KeeperUploadImages
       include Dry::Transaction
-      step :create_keeper_mapper
+      step :validate_input
       step :upload_image
-      step :store_upload_record
       step :create_keeper_info
+      step :reify_keeper
 
       private
 
-      def create_keeper_mapper(input) # rubocop:disable Metrics/MethodLength
-        input = input[:keeper_info]
-        keeper_mapper = PetAdoption::LossingPets::KeeperMapper.new(
-          input.slice(:hair, :bodytype, :species),
-          input.slice(:name, :email, :phone, :county),
-          input[:location]
-        )
-        input = [keeper_mapper, input[:file], input[:distance],
-                 input[:searchcounty], input[:county]]
-        Success(input:)
-      rescue StandardError => e
-        Failure(e.message)
+      def validate_input(input)
+        if input.success?
+          Success(input.to_h.transform_keys(&:to_s))
+        else
+          Failure(input.errors.to_h)
+        end
       end
 
       def upload_image(input)
-        keeper_mapper = input[:input][0]
-        keeper_mapper.upload_image(input[:input][1])
-        input = [keeper_mapper, input[:input][2], input[:input][3], input[:input][4]]
-        Success(input:)
-      rescue StandardError => e
-        Failure(e.message)
-      end
+        file_path = input['file']
+        s3 = PetAdoption::Storage::S3.new
+        base_url, object = PetAdoption::Storage::S3.object_url(file_path)
 
-      def store_upload_record(input)
-        keeper_mapper = input[:input][0]
-        keeper_mapper.store_user_info
-        input = [keeper_mapper, input[:input][1], input[:input][2], input[:input][3]]
-        Success(input:)
+        return Failure('S3 cant upload your image') unless PetAdoption::Storage::S3.upload_image_to_s3(file_path)
+
+        s3.make_image_public(object)
+        input['file'] = "#{base_url}/#{object}"
+
+        Success(input)
       rescue StandardError => e
         Failure(e.message)
       end
 
       def create_keeper_info(input)
-        keeper_mapper = input[:input][0]
-        keeper = keeper_mapper.build_entity(input[:input][1], input[:input][2], input[:input][3])
+        keeper = Gateway::Api.new(PetAdoption::App.config).contact_finders(input)
 
-        if keeper.lossing_animals_list.empty?
-          raise StandardError, 'Sorry, in this moment, there is no lossing pet nearby you'
-        end
+        Success(keeper)
+      rescue StandardError
+        Failure('Sorry, in this moment, there is no lost animal nearby you')
+      end
 
-        Success(keeper:)
+      def reify_keeper(results)
+        keeper = Representer::PotentialFinderRepresenter.new(OpenStruct.new).from_json(results.payload)
+        Success(keeper)
+      rescue StandardError
+        Failure('Error in parsing keeper')
       end
     end
   end

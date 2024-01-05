@@ -137,22 +137,20 @@ module PetAdoption
 
       routing.post 'finder/recommend-vets' do
         uploaded_file = routing.params['file0'][:tempfile].path if routing.params['file0'].is_a?(Hash)
+        selected_keys = %w[name email phone]
+        finder_info = session[:watching].slice(*selected_keys)
+        finder_info['county'] = routing.params['county']
+        finder_info['location'] = routing.params['location']
+        finder_info['file'] = uploaded_file
+        finder_info['distance'] = routing.params['distance']
+        finder_info['number'] = routing.params['number']
 
-        selected_keys = %w[name email phone address]
-        finder_info = session[:watching].slice(*selected_keys).transform_keys(&:to_sym)
-        finder_info[:county] = routing.params['county']
-        finder_info.delete(:address)
-        finder_info[:location] = "#{routing.params['location']},#{finder_info[:county]}"
-        finder_info[:file] = uploaded_file
-        finder_info[:number] = routing.params['number'].to_i
-        finder_info[:distance] = routing.params['distance'].to_i
+        finder_preference = Forms::FinderInputsValidator.new.call(finder_info)
 
-        binding.pry
+        res = Services::FinderUploadImages.new.call(finder_preference)
 
-        res = Services::FinderUploadImages.new.call({ finder_info: })
-
-        instructions = PetAdoption::Views::TakeCareInfo.new(res.value![:finder])
-        location_data = PetAdoption::Views::Clinic.new(res.value![:finder])
+        instructions = PetAdoption::Views::TakeCareInfo.new(res)
+        location_data = PetAdoption::Views::Clinic.new(res)
 
         view 'finder', locals: { location_data:, instructions: }
       rescue StandardError
@@ -192,23 +190,19 @@ module PetAdoption
 
       routing.post 'keeper/contact-finders' do
         uploaded_file = routing.params['file0'][:tempfile].path if routing.params['file0'].is_a?(Hash)
+        selected_keys = %w[name email phone]
+        keeper_info = session[:watching].slice(*selected_keys)
+        keeper_info['county'] = routing.params['county']
+        keeper_info['location'] = routing.params['location']
+        keeper_info['file'] = uploaded_file
+        keeper_info['searchcounty'] = routing.params['searchcounty']
+        keeper_info['distance'] = routing.params['distance']
 
-        selected_keys = %w[name email phone address]
-        keeper_info = session[:watching].slice(*selected_keys).transform_keys(&:to_sym)
-        keeper_info.delete(:address)
-        keeper_info[:county] = routing.params['county']
+        keeper_preference = Forms::KeeperInputsValidator.new.call(keeper_info)
 
-        keeper_info[:location] = routing.params['location']
-        keeper_info[:file] = uploaded_file
-        keeper_info[:bodytype] = routing.params['bodytype']
-        keeper_info[:hair] = routing.params['hair']
-        keeper_info[:species] = routing.params['species']
-        keeper_info[:searchcounty] = routing.params['searchcounty'] == 'yes'
-        keeper_info[:distance] = routing.params['distance'].to_i
+        res = Services::KeeperUploadImages.new.call(keeper_preference)
 
-        res = Services::KeeperUploadImages.new.call({ keeper_info: })
-
-        information = PetAdoption::Views::LossingPets.new(res.value![:keeper])
+        information = PetAdoption::Views::LossingPets.new(res.value!)
 
         view 'keeper', locals: { information: }
       rescue StandardError

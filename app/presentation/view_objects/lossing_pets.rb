@@ -8,12 +8,12 @@ module PetAdoption
       attr_reader :lossing_pets_info
 
       def initialize(result)
-        @lossing_pets_info = merge(result.lossing_animals_list)
+        @lossing_pets_info = merge(result.finders)
       end
 
       def merge(feature_list)
         feature_list.map do |feature|
-          feature.slice(:name, :phone, :email, :species, :s3_image_url, :longtitude, :latitude, :distance)
+          feature.to_h.slice(:name, :phone, :email, :species, :s3_image_url, :longtitude, :latitude, :distance)
         end
       end
     end

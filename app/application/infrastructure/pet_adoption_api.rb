@@ -69,7 +69,7 @@ module PetAdoption
         end
 
         def recommend_some_vets(user_preference)
-          call_api('post', %w[finder recommend-vets], user_preference)
+          call_api('post', %w[finder vets], user_preference)
         end
 
         def count_animal_score(user_preference)
@@ -77,7 +77,7 @@ module PetAdoption
         end
 
         def contact_finders(keeper_info)
-          call_api('post', %w[keeper contact-finders], keeper_info)
+          call_api('post', %w[keeper contact], keeper_info)
         end
 
         def promote_user_animals(user_preference)
@@ -94,7 +94,6 @@ module PetAdoption
         def call_api(method, resources = [], params = {})
           api_path = resources.empty? ? @api_host : @api_root
           url = [api_path, resources].flatten.join('/') + params_str(params)
-          puts url
           HTTP.headers('Accept' => 'application/json').send(method, url)
             .then { |http_response| Response.new(http_response) }
         rescue StandardError

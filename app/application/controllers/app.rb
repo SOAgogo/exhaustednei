@@ -147,7 +147,6 @@ module PetAdoption
 
         finder_preference = Forms::FinderInputsValidator.new.call(finder_info)
 
-        puts finder_preference
         res = Services::FinderUploadImages.new.call(finder_preference)
 
         instructions = PetAdoption::Views::TakeCareInfo.new(res)

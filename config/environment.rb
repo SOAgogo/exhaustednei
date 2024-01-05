@@ -38,7 +38,8 @@ module PetAdoption
       def self.db = @db # rubocop:disable Style/TrivialAccessors
 
       # Logger Setup
-      @logger = Logger.new($stderr)
+      # @logger = Logger.new($stderr)
+      @logger = Logger.new($stdout)
       def self.logger = @logger # rubocop:disable Style/TrivialAccessors
 
       configure :development, :test, :app_test do

@@ -25,8 +25,8 @@ module PetAdoption
       end
 
       def upload_image(input)
-        puts file_path
         file_path = input['file']
+        puts file_path
         s3 = PetAdoption::Storage::S3.new
         base_url, object = PetAdoption::Storage::S3.object_url(file_path)
         PetAdoption::Storage::S3.upload_image_to_s3(file_path)

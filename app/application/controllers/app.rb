@@ -16,6 +16,7 @@ module PetAdoption
   class App < Roda
     plugin :halt
     plugin :flash
+    plugin :caching
     plugin :all_verbs # allows HTTP verbs beyond GET/POST (e.g., DELETE)
     plugin :render, engine: 'slim', views: 'app/presentation/views_html'
     plugin :public, root: 'app/presentation/public'
@@ -87,30 +88,36 @@ module PetAdoption
         end
 
         routing.on String, String do |animal_kind, shelter_name|
-          ak_ch = animal_kind == 'dog' ? '狗' : '貓'
+          routing.get do
+            ak_ch = animal_kind == 'dog' ? '狗' : '貓'
 
-          shelter_name = URI.decode_www_form_component(shelter_name)
-          animal_kind = URI.decode_www_form_component(ak_ch)
-          shelter_selector = Forms::ShelterSelector.new.call({ animal_kind:, shelter_name: })
+            shelter_name = URI.decode_www_form_component(shelter_name)
+            animal_kind = URI.decode_www_form_component(ak_ch)
+            shelter_selector = Forms::ShelterSelector.new.call({ animal_kind:, shelter_name: })
 
-          begin
-            get_all_animals_in_shelter = Services::SelectAnimal.new.call(shelter_selector)
-            crawded_ratio = Services::ShelterCapacityCounter.new.call(shelter_selector)
-            old_animal_num = Services::NumberOfOldAnimals.new.call(shelter_selector)
-            view_animals = PetAdoption::Views::AnimalInShelter.new(get_all_animals_in_shelter)
-            view_crawded_ratio = PetAdoption::Views::ShelterCrowdedness.new(crawded_ratio)
-            view_old_animal_num = PetAdoption::Views::Serverity.new(old_animal_num)
+            begin
+              get_all_animals_in_shelter = Services::SelectAnimal.new.call(shelter_selector)
+              crawded_ratio = Services::ShelterCapacityCounter.new.call(shelter_selector)
+              old_animal_num = Services::NumberOfOldAnimals.new.call(shelter_selector)
+              view_animals = PetAdoption::Views::AnimalInShelter.new(get_all_animals_in_shelter)
+              view_crawded_ratio = PetAdoption::Views::ShelterCrowdedness.new(crawded_ratio)
+              view_old_animal_num = PetAdoption::Views::Serverity.new(old_animal_num)
 
-            view 'project', locals: {
-              view_animals:,
-              view_crawded_ratio:,
-              view_old_animal_num:,
-              shelter_name:
-            }
-          rescue StandardError
-            # App.logger.error err.backtrace.join("DB can't find the results\n")
-            flash[:error] = 'Could not find the results.'
-            routing.redirect '/home'
+              App.configure :production do
+                response.expires 300, public: true
+              end
+
+              view 'project', locals: {
+                view_animals:,
+                view_crawded_ratio:,
+                view_old_animal_num:,
+                shelter_name:
+              }
+            rescue StandardError
+              # App.logger.error err.backtrace.join("DB can't find the results\n")
+              flash[:error] = 'Could not find the results.'
+              routing.redirect '/home'
+            end
           end
         end
       end
@@ -124,6 +131,10 @@ module PetAdoption
           response = Services::PickAnimalByOriginID.new.call(user_preference)
 
           view_obj = Views::ScoreForAnimal.new(response)
+
+          App.configure :production do
+            response.expires 30, public: true
+          end
 
           return view_obj.value.to_json
         end

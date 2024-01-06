@@ -16,7 +16,7 @@ module PetAdoption
 
       def validate_input(input)
         if input.success?
-          puts 'validate input success'
+          # puts 'validate input success'
           Success(input.to_h.transform_keys(&:to_s))
         else
           Failure(input.errors.to_h)

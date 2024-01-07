@@ -132,10 +132,6 @@ module PetAdoption
 
           view_obj = Views::ScoreForAnimal.new(response)
 
-          App.configure :production do
-            response.expires 30, public: true
-          end
-
           return view_obj.value.to_json
         end
       rescue StandardError

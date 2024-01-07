@@ -38,7 +38,7 @@ module PetAdoption
       # GET /
       routing.root do
         session[:watching] ||= {}
-        routing.redirect '/home' if session[:watching]['session_id']
+        routing.redirect '/home'
         flash.now[:notice] = 'Welcome web page' unless session[:watching]['session_id']
         # view('shelter_info')
         view('signup')

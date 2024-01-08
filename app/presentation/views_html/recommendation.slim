@@ -1,0 +1,46 @@
+div.gallery {
+  display: flex
+}
+h3 your recommedation lists
+body
+  div.gallery
+      - output.prefer_animals.each do |animal| 
+        .row 
+        .column 
+            legend
+                | #{animal[0]}
+            .row
+            .column
+                .card
+                .card-content
+                    img[src="#{animal[1]['image_url']}" class="img-thumbnail" alt="Cinque Terre" width = 200 height = 200]
+                .card-content
+                    .container
+                    h4
+                        | "#{animal[1]['species']}"
+                    p.title
+                        | Id : "#{animal[1]['origin_id'].to_s}"
+                    p
+                        | Color : "#{animal[1]['color']}"
+                    p
+                        | Sex : "#{animal[1]['sex']}"
+                    p
+                        | Age : "#{animal[1]['age']}"
+                    p 
+                        | Sterilization : "#{animal[1]['sterilized']}"
+                    p 
+                        | Vaccinated : "#{animal[1]['vaccinated']}"
+                    p 
+                        | BodyType : "#{animal[1]['bodytype']}"
+                    p 
+                        | RegisterDate : "#{animal[1]['registration_date']}"
+
+                    p.lead 
+                        | Score : #{animal[2].to_s}
+                    
+            
+            
+        
+
+
+

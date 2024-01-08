@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 # test the data coming from gateway api are the same as the data in the database
-require_relative '../integration/layers/spec_helper'
+# require_relative '../integration/layers/test_helper'
 require_relative '../../helpers/vcr_helper'
 require 'uri'
 require 'json'
+require_relative '../../app/domain/promote_animals_to_users/repositories/for'
 
 describe 'Test Animal API' do
   VcrHelper.setup_vcr
@@ -37,12 +38,14 @@ describe 'Test Animal API' do
       # Perform the request
       response = JSON.parse(http.request(request).body)[0]
 
-      shelter = Repository::Info::Shelters.find_shelter_id(response['animal_shelter_pkid'])
+      shelter = PetAdoption::Repository::For.kclass(PetAdoption::Entity::Shelter)
+        .find_shelter_by_name(response['shelter_name'])
 
-      _(response['animal_shelter_pkid']).must_equal(shelter.animal_shelter_pkid)
-      _(response['shelter_name']).must_equal(shelter.shelter_name)
-      _(response['shelter_address']).must_equal(shelter.shelter_address)
-      _(response['shelter_tel']).must_equal(shelter.shelter_tel)
+      # NoMethodError: undefined method `origin_id' for nil:NilClass
+      _(response['animal_shelter_pkid']).must_equal(shelter.origin_id)
+      _(response['shelter_name']).must_equal(shelter.name)
+      _(response['shelter_address']).must_equal(shelter.address)
+      _(response['shelter_tel']).must_equal(shelter.phone_number)
     end
   end
 end

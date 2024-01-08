@@ -9,7 +9,6 @@ require 'securerandom'
 require 'fileutils'
 require 'open3'
 require 'pry'
-
 module PetAdoption
   # for controller part
 
@@ -17,11 +16,17 @@ module PetAdoption
   class App < Roda
     plugin :halt
     plugin :flash
+    plugin :caching
     plugin :all_verbs # allows HTTP verbs beyond GET/POST (e.g., DELETE)
     plugin :render, engine: 'slim', views: 'app/presentation/views_html'
     plugin :public, root: 'app/presentation/public'
-    plugin :assets, path: 'app/presentation/assets',
-                    css: 'style.css', js: 'popup.js'
+    plugin :assets, path: 'app/presentation/assets', group_subdirs: false,
+                    css: 'style.css',
+                    js: {
+                      map: ['map.js'],
+                      keeper: ['keeper.js']
+                    }
+
     plugin :common_logger, $stderr
     plugin :json
 
@@ -34,19 +39,18 @@ module PetAdoption
       routing.assets # load CSS
       response['Content-Type'] = 'text/html; charset=utf-8'
       routing.public # load static files
+      session[:map_key] = App.config.MAP_TOKEN
 
       # GET /
       routing.root do
         session[:watching] ||= {}
-        routing.redirect '/home'
-        flash.now[:notice] = 'Welcome web page' unless session[:watching]['session_id']
-        # view('shelter_info')
+        routing.redirect '/home' if session[:watching]['name']
+        flash.now[:notice] = 'Welcome web page' unless session[:watching]['name']
+
         view('signup')
       end
 
       routing.post 'signup' do
-        session_id = SecureRandom.uuid
-        routing.params.merge!('session_id' => session_id)
         url_request = Forms::UserDataValidator.new.call(routing.params.transform_keys(&:to_sym))
         if url_request.failure?
           session[:watching] = {}
@@ -54,23 +58,14 @@ module PetAdoption
           routing.redirect '/'
         end
 
-        # for domain testing
-        cookie_hash = routing.params
-        Services::TestForDomain.new.call(cookie_hash)
-        db_user = Services::CreateUserAccounts.new.call(url_request:)
-
-        flash.now[:notice] = 'Your user creation failed...' if db_user.failure?
         session[:watching] = routing.params
         routing.redirect '/home'
       end
 
       routing.on 'home' do
         routing.is do
-          animal_pic = Services::PickAnimalCover.new.call
-          cover_page = PetAdoption::Views::Picture.new(animal_pic.value![:cover]).cover
-          view 'home', locals: { image_url: cover_page }
+          view 'home'
         rescue StandardError
-          # App.logger.error e.backtrace.join("DB can't show COVER PAGE\n")
           flash[:error] = 'Could not find the cover page.'
         end
       end
@@ -96,119 +91,133 @@ module PetAdoption
         end
 
         routing.on String, String do |animal_kind, shelter_name|
-          ak_ch = animal_kind == 'dog' ? '狗' : '貓'
-          shelter_name = URI.decode_www_form_component(shelter_name)
-          animal_kind = URI.decode_www_form_component(ak_ch)
-          begin
-            response = Services::SelectAnimal.new.call({ animal_kind:, shelter_name: })
-            view_obj = PetAdoption::Views::ChineseWordsCanBeEncoded.new(response.value![:animal_obj_list])
+          routing.get do
+            ak_ch = animal_kind == 'dog' ? '狗' : '貓'
 
-            
-            view 'project', locals: {
-              view_obj:
-            }
-          rescue StandardError
-            # App.logger.error err.backtrace.join("DB can't find the results\n")
-            flash[:error] = 'Could not find the results.'
-            routing.redirect '/home'
+            shelter_name = URI.decode_www_form_component(shelter_name)
+            animal_kind = URI.decode_www_form_component(ak_ch)
+            shelter_selector = Forms::ShelterSelector.new.call({ animal_kind:, shelter_name: })
+
+            begin
+              get_all_animals_in_shelter = Services::SelectAnimal.new.call(shelter_selector)
+              crawded_ratio = Services::ShelterCapacityCounter.new.call(shelter_selector)
+              old_animal_num = Services::NumberOfOldAnimals.new.call(shelter_selector)
+              view_animals = PetAdoption::Views::AnimalInShelter.new(get_all_animals_in_shelter)
+              view_crawded_ratio = PetAdoption::Views::ShelterCrowdedness.new(crawded_ratio)
+              view_old_animal_num = PetAdoption::Views::Serverity.new(old_animal_num)
+
+              App.configure :production do
+                response.expires 300, public: true
+              end
+
+              view 'project', locals: {
+                view_animals:,
+                view_crawded_ratio:,
+                view_old_animal_num:,
+                shelter_name:
+              }
+            rescue StandardError
+              # App.logger.error err.backtrace.join("DB can't find the results\n")
+              flash[:error] = 'Could not find the results.'
+              routing.redirect '/home'
+            end
           end
         end
       end
 
-      routing.on 'user/add-favorite-list', String do |animal_id|
-        animal_obj_list = PetAdoption::Services::FavoriteListUser
-          .new.call({
-                      session_id: session[:watching]['session_id'], animal_id:
-                    })
-        # don't store animal_obj_list to cookies, it's too big
-        session[:watching]['animal_obj_list'] = animal_obj_list.value![:animals]
-
-        view_obj = PetAdoption::Views::ChineseWordsCanBeEncoded.new(animal_obj_list.value![:animals])
+      routing.post 'user/count-animal-score' do
         routing.is do
-          view 'favorite', locals: {
-            view_obj:
-          }
-        end
-      end
+          params = session[:watching].merge('animal_id' => routing.params['animalId'])
 
-      routing.on 'user/favorite-list' do
-        routing.is do
-          animal_obj_list = session[:watching]['animal_obj_list']
-          view_obj = PetAdoption::Views::ChineseWordsCanBeEncoded.new(animal_obj_list)
-          view 'favorite', locals: {
-            view_obj:
-          }
-        end
-      end
+          user_preference = Forms::UserPreference.new.call(params.transform_keys(&:to_sym))
 
-      routing.on 'next-keeper' do
-        routing.is do
-          view 'next-keeper'
-        end
-      end
+          response = Services::PickAnimalByOriginID.new.call(user_preference)
 
-      routing.on 'adopt' do
-        routing.post do
-          view 'adopt'
+          view_obj = Views::ScoreForAnimal.new(response)
+
+          return view_obj.value.to_json
         end
+      rescue StandardError
+        flash[:error] = 'Could not count the score.'
       end
 
       routing.on 'found' do
-        routing.post do
+        view 'found'
+      end
 
-          PetAdoption::ImageRecognition::S3.S3_init
+      routing.post 'finder/recommend-vets' do
+        uploaded_file = routing.params['file0'][:tempfile].path if routing.params['file0'].is_a?(Hash)
+        selected_keys = %w[name email phone]
+        finder_info = session[:watching].slice(*selected_keys)
+        finder_info['county'] = routing.params['county']
+        finder_info['location'] = routing.params['location']
+        finder_info['file'] = uploaded_file
+        finder_info['distance'] = routing.params['distance']
+        finder_info['number'] = routing.params['number']
 
-          founding_list = File.read("example.txt")
-          founding_list = founding_list.lines
+        finder_preference = Forms::FinderInputsValidator.new.call(finder_info)
 
-          uploaded_file = routing.params['file0'][:tempfile].path if routing.params['file0'].is_a?(Hash)
-          url_prefix = 'https://soapicture.s3.ap-northeast-2.amazonaws.com/uploads'
-          founding_list = founding_list.map { |line| "#{url_prefix}#{line}" }
+        res = Services::FinderUploadImages.new.call(finder_preference)
 
-          if uploaded_file.nil?
-            view 'found', locals: { output: nil ,
-                                    founding_list: }
-          else
-            File.open("example.txt", "a") do |file|
-              # Append additional text to the file
-              file.puts uploaded_file
-            end
+        instructions = PetAdoption::Views::TakeCareInfo.new(res)
+        location_data = PetAdoption::Views::Clinic.new(res)
 
-            PetAdoption::ImageRecognition::S3.upload_image_to_s3(uploaded_file)
+        view 'finder', locals: { location_data:, instructions: }
+      rescue StandardError
+        flash[:error] = 'Could not find the vets. Please try again.'
+        routing.redirect '/found'
+      end
 
-            output = Services::ImageRecognition.new.call({ uploaded_file: })
-            if output.failure?
-              flash[:error] = 'No recognition output, please try again.'
-              routing.redirect '/found'
-            end
-            #output = output.gsub(/loading roboflow workspace\.\.\./i, "").gsub(/loading roboflow project\.\.\./i, "")
-            output_view = PetAdoption::Views::ImageRecognition.new(output.value![:output])
-            view 'found', locals: { output: output_view ,  
-                                    founding_list: }
-          end
+      routing.on 'adopt' do
+        view 'adopt'
+      end
 
+      routing.post 'promote-user-animals' do
+        keys_to_exclude = %w[name email phone address]
+        user_preference = session[:watching].except(*keys_to_exclude)
+        ratio = routing.params.transform_keys { |key| "ratio_#{key}" }
+        input = user_preference.merge(ratio)
+        input = input.transform_keys { |key| key == 'ratio_top' ? 'top' : key }
+        req = Forms::RecommendInputsValidator.new.call(input)
+
+        output = Services::PromoteUserAnimals.new.call(req)
+        if output.failure?
+          flash[:error] = 'Recommendation failed, please try again.'
+          routing.redirect '/adopt'
         end
+
+        output_view = PetAdoption::Views::PromoteUserAnimals.new(output.value!)
+
+        view 'recommendation', locals: { output: output_view }
       end
 
 
 
       routing.on 'missing' do
-        routing.post do
-          view 'missing'
-        end
+        view 'missing'
       end
 
-      routing.on 'shelter_statistics' do
-        routing.is do
-          # stats_output = Services::ShelterStatistics.new.call
-          shelter = PetAdoption::ShelterInfo::ShelterInfoMapper.new('臺中市動物之家南屯園區').build_entity
+      routing.post 'keeper/contact-finders' do
+        uploaded_file = routing.params['file0'][:tempfile].path if routing.params['file0'].is_a?(Hash)
+        selected_keys = %w[name email phone]
+        keeper_info = session[:watching].slice(*selected_keys)
+        keeper_info['county'] = routing.params['county']
+        keeper_info['location'] = routing.params['location']
+        keeper_info['file'] = uploaded_file
+        keeper_info['searchcounty'] = routing.params['searchcounty']
+        keeper_info['distance'] = routing.params['distance']
 
-          output = { 'sterilization' => shelter.count_num_sterilizations,
-                     'no_sterilizations' => shelter.count_num_no_sterilizations,
-                     'for_bacterin' => shelter.count_num_animal_bacterin,
-                     'no_bacterin' => shelter.count_num_animal_no_bacterin }
-          view 'shelter_info', locals: { output: }
-        end
+        keeper_preference = Forms::KeeperInputsValidator.new.call(keeper_info)
+
+        # puts 'keeper_preference'
+        res = Services::KeeperUploadImages.new.call(keeper_preference)
+
+        information = PetAdoption::Views::LossingPets.new(res.value!)
+
+        view 'keeper', locals: { information: }
+      rescue StandardError
+        flash[:error] = 'Sorry, in this moment, there is no lossing pet nearby you'
+        routing.redirect '/missing'
       end
     end
   end

@@ -4,53 +4,67 @@ html
     meta http-equiv="Content-Type" content="text/html; charset=UTF-8"
     script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"
   body
-    .container
-      h2 Report a Missing Pet
-      form name="form0" id="form0"
-        input type="file" name="file0" id="file0" multiple="multiple"
-        br
-        img src="" id="img0"
-
-
-      javascript:  
-        $("#file0").change(function(){
-            var objUrl = getObjectURL(this.files[0]) ;
-            console.log("objUrl = "+objUrl) ;
-            if (objUrl) {
-                $("#img0").attr("src", objUrl) ;
-            }
-        }) ;
-        
-        function getObjectURL(file) {
-            var url = null ; 
-            if (window.createObjectURL!=undefined) { // basic
-                url = window.createObjectURL(file) ;
-            } else if (window.URL!=undefined) { // mozilla(firefox)
-                url = window.URL.createObjectURL(file) ;
-            } else if (window.webkitURL!=undefined) { // webkit or chrome
-                url = window.webkitURL.createObjectURL(file) ;
-            }
-            return url ;
-            console.log( url )
-        }
+    legend
+      | Report a Missing Pet
+    form name="form0" action="/keeper/contact-finders" method="post" id="form0" enctype="multipart/form-data"
+      label for="picture_description" Which county do your dog(cat) get lost?
+      input type="text" name="county" id="county" placeholder="chinese-word county"
       
-      form#missing-pet-form action="/report_missing_pet" method="post" enctype="multipart/form-data"
-        .form-group
-          label for="pet_name" Pet Name:
-          input type="text" name="pet_name" id="pet_name" required
+      br
+      br
+      label for="location" which is the precise location your pets get lost?
+      input type="text" name="location" id="location" placeholder="chinese-word place"
+      br
+      br
+      
+      label for="bodytype" Describe what's the body type of your animal?
+      input type="text" name="bodytype" id="bodytype" placeholder="big or medium or small"
 
-        .form-group
-          label for="description1" Description:
-          textarea name="description1" id="description1" rows="4" required
+      br
+      br
+      label for="hair" Describe how long is your pet's hair?
+      input type="text" name="hair" id="hair" placeholder="long or short"
 
-        .form-group
-          label for="last_seen_location" Last Seen Location:
-          input type="text" name="last_seen_location" id="last_seen_location" required
+      br
+      br
 
-        .form-group
-          label for="contact_info" Contact Information:
-          input type="text" name="contact_info" id="contact_info" required
+      label for="species" Describe what's the species of your animal?
+      input type="text" name="species" id="species" placeholder="dog or cat species"
 
-        .form-group
-          input.btn-submit type="submit" value="Report Missing Pet"
-  
+      br
+      br
+
+      label for="distance" how long the distance you want to search for your pets?
+      input type="text" name="distance" id="distance"
+      br
+      br
+
+      .p
+        | Search the lost animals depending on your county
+      #chk_0.form-check.form-check-inline
+              label.form-check-label
+                input#radPetType0.form-check-input[data-sval="0" type="radio" name="searchcounty" value="yes"]
+                  | Yes
+                  span.circle
+                  span.check
+      #chk_1.form-check.form-check-inline
+              label.form-check-label
+                input#radPetType1.form-check-input[data-sval="1" type="radio" name="searchcounty" value="no"]
+                  | No 
+                  span.circle
+                  span.check 
+
+      br 
+      br
+
+
+      input type="file" name="file0" id="file0" multiple="multiple"
+
+      br
+      br
+
+      img src="" id="img0"
+      br
+      br
+      button.btn.btn-secondary[type="submit"]
+        | Submit

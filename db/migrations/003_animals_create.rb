@@ -8,21 +8,19 @@ Sequel.migration do
       primary_key :id
 
       foreign_key :shelter_id, :shelters
-      foreign_key :users_id, :users
 
-      Integer :animal_id, unique: true, null: false
-      String :animal_kind, null: false
-      String :animal_variate
-      String :animal_sex, null: false
-      Boolean :animal_sterilization
-      Boolean :animal_bacterin
-      String :animal_bodytype
-      String :animal_color
-      String :animal_age
-      String :animal_found_place
-      String :album_file
-      String :animal_place, null: false
-      String :animal_opendate
+      Integer :origin_id, unique: true, null: false
+      String :kind, null: false
+      String :species
+      String :sex, null: false
+      Boolean :sterilized
+      Boolean :vaccinated
+      String :bodytype
+      String :color
+      String :age
+      String :image_url
+      Time :registration_date, null: false
+
       DateTime :created_at
       DateTime :updated_at
     end

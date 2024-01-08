@@ -31,16 +31,16 @@ module PetAdoption
 
       use Rack::Session::Cookie, {
         secret: config.SESSION_SECRET,
-        expire_after: 30
-        # expire_after: 30
+        expire_after: 60 * 60 * 24 * 7 # one week
       }
-      # Database Setup
-      @db = Sequel.connect(ENV.fetch('DATABASE_URL'))
-      def self.db = @db # rubocop:disable Style/TrivialAccessors
 
-      @logger = Logger.new($stderr)
-      class << self
-        attr_reader :logger
+      # Logger Setup
+      # @logger = Logger.new($stderr)
+      @logger = Logger.new($stdout)
+      def self.logger = @logger # rubocop:disable Style/TrivialAccessors
+
+      configure :development, :test, :app_test do
+        require 'pry'; # for breakpoints
       end
     end
   end

@@ -2,53 +2,62 @@ div.gallery {
   display: flex
 }
 
-  .row
-    .img_wrap
-    
-      img src="https://im.marieclaire.com.tw/m800c533h100b0/assets/mc/201907/5D19A650F04EF1561962064.png"  alt="一張圖片"
-
   body
+  h1 class="display-5" #{shelter_name}
+  li
+  | Shelter information:
+  ul
+    li How crowded  is this shelter(animal number divided by maximum commodations): #{view_crawded_ratio.value.to_s}
+    li How many old animals live here(stayed over 150 days): #{view_old_animal_num.old_animal_num}
+    li Too many old animals live here? Extent: #{view_old_animal_num.serverity}
   div.gallery
-      - view_obj.animal_obj_list.each do |_,obj| 
+      - view_animals.transform.each do |obj| 
         .row
           .column
             .card
               .card-content
-                img[src="#{obj.album_file}" class="img-thumbnail" alt="Cinque Terre" width = 200 height = 200]
+                img[src="#{obj[:image_url]}" class="img-thumbnail" alt="Cinque Terre" width = 200 height = 200]
               .card-content
                 .container
                   h4
-                    | "#{obj.animal_variate}"
+                    | "#{obj[:species]}"
                   p.title
-                    | Id : "#{obj.animal_id.to_s}"
+                    | Id : "#{obj[:origin_id].to_s}"
                   p
-                    | Shelter : "#{obj.animal_place}"
+                    | Color : "#{obj[:color]}"
                   p
-                    | FoundPlace : "#{obj.animal_found_place}"
+                    | Sex : "#{obj[:sex]}"
                   p
-                    | Color : "#{obj.animal_color}"
-                  p
-                    | Sex : "#{obj.animal_sex}"
-                  p
-                    | Age : "#{obj.animal_age}"
+                    | Age : "#{obj[:animal_age]}"
                   p 
-                    | Sterilization : "#{obj.animal_sterilization}"
+                    | Sterilization : "#{obj[:sterilized]}"
                   p 
-                    | Bacterin : "#{obj.animal_bacterin}"
+                    | Vaccinated : "#{obj[:vaccinated]}"
                   p 
-                    | BodyType : "#{obj.animal_bodytype}"
+                    | BodyType : "#{obj[:bodytype]}"
                   p 
-                    | FoundPlace : "#{obj.animal_found_place}"
-                  p 
-                    | RegisterDate : "#{obj.animal_opendate}"
+                    | RegisterDate : "#{obj[:registration_date]}"
                   p
-                     form[action="/user/add-favorite-list/#{obj.animal_id.to_s}" method="POST"]
-                      button.button type="submit"
-                        | Add to favorite list
-                  
-        
-          
-      
+                    button.button type="button" class="count-point-btn" data-animal-id="#{obj[:origin_id].to_s}" onclick="sendAnimalScoreRequest(#{obj[:origin_id].to_s})"
+                      | Count the score of the animal
+                    
+                    p class="card-text" id="#{obj[:origin_id].to_s}"
+                      
 
-
-
+javascript:
+  function sendAnimalScoreRequest(animalId) {
+    $.ajax({
+      type: 'POST',
+      url: '/user/count-animal-score',
+      data: { animalId: animalId },
+      dataType: 'json',
+      success: function(response) {
+        console.log('score ', response.scores);
+        //console.log('score ', response);
+        $('#' + animalId).text('How many features which matches your preference: ' + response.scores);
+      },
+      error: function(error) {
+        console.error('Error:', error);
+      }
+    });
+  }

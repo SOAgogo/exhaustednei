@@ -89,36 +89,23 @@
           value='submit' class="btn btn-success" 
         } Show Result
 
-
-
-
     .row
       .col-md-12.blank-row
 
-
   .row
     .img_wrap
-      img src= image_url  alt="一張圖片"  width="40%" height="500"
+      img src= 'https://dm6g3jbka53hp.cloudfront.net/static-images/adopt-me-pet-02032021.jpg'  alt="一張圖片"  width="40%" height="500"
       img src='https://i.imgur.com/8bGEJVu.png' alt="另一張圖片" width="60%" height="500"
-  .row 
-    .video_wrap
-      iframe width="560" height="315" src="https://www.youtube.com/embed/_xI0goCHDmE?si=ozD8HYP_Gvl2nKfp" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen
-
-
+  br 
 section
   div.row
     div.col
       form action="/adopt" method="post"
-        button.btn.btn-adopt style="width: 100%; height: 200px;" type="submit" Adopt?
+        button.btn.btn-outline-primary style="width: 100%; height: 200px;" type="submit" Adopt?
     div.col
-      form action="/found" method="post"
-        button.btn.btn-found style="width: 100%; height: 200px;" type="submit" Found?
+      form action="/found" method="get"
+        button.btn.btn-outline-success style="width: 100%; height: 200px;" type="submit" Found?
     div.col
       form action="/missing" method="post"
-        button.btn.btn-missing style="width: 100%; height: 200px;" type="submit" Missing?
-    div.col
-      form action="/next-keeper" method="post"
-        button.btn.btn-secondary style="width: 100%; height: 200px;" type="submit" Find the next keeper?
-    div.col
-      form action="/donate-shelter" method="post"
-        button.btn.btn-info style="width: 100%; height: 200px;" type="submit" Doante shelters?
+        button.btn.btn-outline-danger style="width: 100%; height: 200px;" type="submit" Missing?
+    

@@ -1,0 +1,6 @@
+amazon:
+  service : s3
+  access_key_id : 'AKIATZHPFFZAUY3OL4AZ'
+  secret_key_id : '5GSMAnItUNVfjelW5Xfg+VpGkjepgclt/cgnm6Z6'
+  region : 'ap-northeast-2'
+  bucket : 'soapicture' 

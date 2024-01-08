@@ -7,15 +7,20 @@ ruby File.read('.ruby-version').strip
 gem 'figaro', '~> 1.2'
 gem 'pry'
 gem 'rake', '~> 13.0'
+gem 'libxml-ruby', '~> 3.1'
 
 # PRESENTATION LAYER
 gem 'slim', '~> 5.0'
 
 # APPLICATION LAYER
 # Web application related
+gem 'activerecord', '~> 5.0', '>= 5.0.0.1'
+gem 'aws-sdk-s3', '~> 1.141'
+gem 'execjs'
 gem 'puma', '~> 6.0'
 gem 'rack-session', '~> 0.3'
 gem 'roda', '~> 3.0'
+gem 'roar', '~> 1.0.0'
 
 # Controllers and services
 gem 'dry-monads', '~> 1.4'
@@ -29,7 +34,11 @@ gem 'dry-types', '~> 1.0'
 
 # INFRASTRUCTURE LAYER
 # Networking
+gem 'geocoder', '~> 1.3', '>= 1.3.7'
+gem 'google-maps', '~> 3.0.7'
 gem 'http', '~> 5.0'
+
+gem 'open-uri', '~> 0.1'
 
 # Database
 gem 'hirb'

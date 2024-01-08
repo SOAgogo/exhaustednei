@@ -1,0 +1,10 @@
+h3
+  | The possible pets you get lost 
+  small.text-muted
+    | with some contact information of finders
+.row
+  .col
+    div id="map" data-location="#{information.lossing_pets_info.to_json}" style="width: 700px; height: 500px;"
+  
+
+== assets([:js, :keeper])

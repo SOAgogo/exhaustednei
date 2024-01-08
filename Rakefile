@@ -15,7 +15,27 @@ end
 namespace :spec do
   desc 'Run unit and integration tests'
   Rake::TestTask.new(:default) do |t|
-    t.pattern = 'spec/tests/{integration,unit}/**/*_spec.rb'
+    t.pattern = 'spec/tests/{integration}/{layers}/*_spec.rb'
+    # t.pattern = 'spec/tests/{unit}/*_spec.rb'
+    # t.pattern = 'spec/tests/{integration,unit}/**/*_spec.rb'
+    # t.pattern = 'spec/tests/integration/layers/gateway_animal_spec.rb'
+    t.warning = false
+  end
+
+  desc 'Run unit, integration, and acceptance tests'
+  Rake::TestTask.new(:all) do |t|
+    t.pattern = 'spec/tests/**/*_spec.rb'
+    t.warning = false
+  end
+end
+
+namespace :another do
+  desc 'Run unit and integration tests'
+  Rake::TestTask.new(:domain) do |t|
+    t.pattern = 'spec/tests/{integration}/{domain}/*_spec.rb'
+    # t.pattern = 'spec/tests/{unit}/*_spec.rb'
+    # t.pattern = 'spec/tests/{integration,unit}/**/*_spec.rb'
+    # t.pattern = 'spec/tests/integration/layers/gateway_animal_spec.rb'
     t.warning = false
   end
 end
@@ -25,13 +45,18 @@ task :respec do
   sh "rerun -c 'rake spec' --ignore 'coverage/*'"
 end
 
-desc 'Run web app in default mode'
-task run: ['run:default']
+desc 'Run the application (default: development mode)'
+task run: ['run:dev']
 
 namespace :run do
-  desc 'Run web app in development or production'
-  task :default do
-    sh 'bundle exec puma'
+  desc 'Run the application in development mode'
+  task :dev do
+    sh "rerun -c --ignore 'coverage/*'  -- bundle exec puma"
+  end
+
+  desc 'Run the application in test mode'
+  task :test do
+    sh "rerun -c --ignore 'coverage/*' -- bundle exec puma -p 9000"
   end
 end
 
@@ -102,11 +127,6 @@ namespace :db do
     FileUtils.rm(PetAdoption::App.config.DB_FILENAME)
     puts "Deleted #{PetAdoption::App.config.DB_FILENAME}"
   end
-end
-
-desc 'Run application console'
-task :console do
-  sh 'pry -r ./load_all'
 end
 
 namespace :vcr do

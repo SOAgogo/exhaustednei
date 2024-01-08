@@ -1,80 +1,170 @@
-.container
-  form#contact_form.well.form-horizontal[action="/signup" method="post"]
-    fieldset
-      legend
-        | Welcome to join us!
-      .form-group
-        label.col-md-4.control-label 
-          | First Name
-        .col-md-4.inputGroupContainer
-          .input-group
-            span.input-group-addon
-              i.glyphicon.glyphicon-user
-            input.form-control[name="firstname" placeholder="First Name" type="text" ]
-      .form-group
-        label.col-md-4.control-label
-          | Last Name
-        .col-md-4.inputGroupContainer
-          .input-group
-            span.input-group-addon
-              i.glyphicon.glyphicon-user
-            input.form-control[name="lastname" placeholder="Last Name" type="text",value=""]
-      .form-group
-        label.col-md-4.control-label
-          | E-Mail
-        input#form2Example18.form-control.form-control-lg[name="email" type="email" placeholder="Your Email"]
+doctype html
+html
+  head
+    title Your Page Title
+    link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
+    link[rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"]
+    link[rel="stylesheet" href="/resources/demos/style.css"]
+    script src="https://code.jquery.com/jquery-3.6.4.min.js"
+    script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"
+    script[src="https://code.jquery.com/jquery-3.6.0.js"]
+    script[src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"]
+    
+    meta[charset="utf-8"]
+    meta[name="viewport" content="width=device-width, initial-scale=1"]
 
-      .form-group
-        label.col-md-4.control-label
-          | Phone 
-        .col-md-4.inputGroupContainer
-          .input-group
-            span.input-group-addon
-              i.glyphicon.glyphicon-earphone
-            input.form-control[name="phone" placeholder="(886)121-1212" type="text" id='your_phone']
-      .form-group
-        label.col-md-4.control-label
-          | Address
-        .col-md-4.inputGroupContainer
-          .input-group
-            span.input-group-addon
-              i.glyphicon.glyphicon-home
-            input.form-control[name="address" placeholder="Address" type="text" id='your_address']
+  body
+    .container
+      form#contact_form.well.form-horizontal[action="/signup" method="post"]
+        fieldset
+          legend
+            | Welcome to join us!
+          .form-group
+            label.col-md-4.control-label 
+              | Name
+            .col-md-4.inputGroupContainer
+              .input-group
+                span.input-group-addon
+                  i.glyphicon.glyphicon-user
+                input.form-control[name="name" placeholder="First Name" type="text" ]
+          .form-group
+            label.col-md-4.control-label
+              | E-Mail
+            input#form2Example18.form-control.form-control-lg[name="email" type="email" placeholder="Your Email"]
+          .form-group
+              label.col-md-4.control-label
+                | Phone 
+              .col-md-4.inputGroupContainer
+                .input-group
+                  span.input-group-addon
+                    i.glyphicon.glyphicon-earphone
+                  input.form-control[name="phone" placeholder="(886)121-1212" type="text" id='your_phone']  
+          .form-group
+              label.col-md-4.control-label
+                | Address
+              .col-md-4.inputGroupContainer
+                .input-group
+                  span.input-group-addon
+                    i.glyphicon.glyphicon-home
+                  input.form-control[name="address" placeholder="Address" type="text" id='your_address']
+          
+         
+          legend
+            | The animal features you preferred
+
+          .form-group
+            label.col-md-4.control-label
+                  | age
+            #chk_0.form-check.form-check-inline
+              label.form-check-label
+                input#radPetType0.form-check-input[data-sval="0" type="radio" name="age" value="CHILD"]
+                  | child
+                  span.circle
+                  span.check
+            #chk_1.form-check.form-check-inline
+              label.form-check-label
+                input#radPetType1.form-check-input[data-sval="1" type="radio" name="age" value="ADULT"]
+                  | adult
+                  span.circle
+                  span.check
+
+          .form-group
+            label.col-md-4.control-label
+                  | sterilized
+            #chk_0.form-check.form-check-inline
+              label.form-check-label
+                input.form-check-input[data-sval="0" type="radio" name="sterilized" value="yes"]
+                  | yes
+                  span.circle
+                  span.check
+            #chk_1.form-check.form-check-inline
+              label.form-check-label
+                input.form-check-input[data-sval="1" type="radio" name="sterilized" value="no"]
+                  | no
+                  span.circle
+                  span.check
+
+          .form-group
+            label.col-md-4.control-label
+                  | bodytype
+            #chk_0.form-check.form-check-inline
+              label.form-check-label
+                input.form-check-input[data-sval="0" type="radio" name="bodytype" value="SMALL"]
+                  | SMALL
+                  span.circle
+                  span.check
+            #chk_1.form-check.form-check-inline
+              label.form-check-label
+                input.form-check-input[data-sval="1" type="radio" name="bodytype" value="MEDIUM"]
+                  | MEDIUM
+                  span.circle
+                  span.check
+
+            #chk_2.form-check.form-check-inline
+              label.form-check-label
+                input.form-check-input[data-sval="1" type="radio" name="bodytype" value="BIG"]
+                  | BIG
+                  span.circle
+                  span.check
+
+
+          .form-group
+            label.col-md-4.control-label
+                | sex
+            #chk_0.form-check.form-check-inline
+              label.form-check-label
+                input.form-check-input[data-sval="0" type="radio" name="sex" value="M"]
+                  | BOY
+                  span.circle
+                  span.check
+            #chk_1.form-check.form-check-inline
+              label.form-check-label
+                input.form-check-input[data-sval="1" type="radio" name="sex" value="F"]
+                  | GIRL
+                  span.circle
+                  span.check
+
+          .form-group
+            label.col-md-4.control-label
+                  | vaccinated
+            #chk_0.form-check.form-check-inline
+              label.form-check-label
+                input.form-check-input[data-sval="0" type="radio" name="vaccinated" value="yes"]
+                  | yes
+                  span.circle
+                  span.check
+            #chk_1.form-check.form-check-inline
+              label.form-check-label
+                input.form-check-input[data-sval="1" type="radio" name="vaccinated" value="no"]
+                  | no
+                  span.circle
+                  span.check
+
+          .form-group
+              label.col-md-4.control-label
+                | species
+              .col-md-4.inputGroupContainer
+                .input-group
+                  span.input-group-addon
+                    i.glyphicon.glyphicon-home
+                  input.form-control[name="species" placeholder=" species you preferred" type="text" id='species']
+
+          
+          .form-group
+              label.col-md-4.control-label
+                | color
+              .col-md-4.inputGroupContainer
+                .input-group
+                  span.input-group-addon
+                    i.glyphicon.glyphicon-home
+                  input.form-control[name="color" placeholder=" fur color you preferred" type="text" id='color']
+
+          .form-group
+            label.col-md-4.control-label
+            .col-md-4
+              button.btn.btn-warning[type="submit"]
+                | Get Started
+                span.glyphicon.glyphicon-send
+
+
       
-      .form-group
-        label.col-md-4.control-label
-          | The reason you want to join us
-        .col-md-4.selectContainer
-          .input-group
-            span.input-group-addon
-              i.glyphicon.glyphicon-list
-            select.form-control.selectpicker[name="state"]
-              option[value=" "]
-                | Please select your reason
-              option
-                | keeper
-              option
-                | adopter
-              option
-                | donater
-     
-      .form-group
-        label.col-md-4.control-label
-          | Anything you want to share with us ?
-        .col-md-4.inputGroupContainer
-          .input-group
-            span.input-group-addon
-              i.glyphicon.glyphicon-pencil
-            textarea.form-control[name="comment" placeholder="willing to hear something"]
-      #success_message.alert.alert-success[role="alert"]
-        | Success 
-        i.glyphicon.glyphicon-thumbs-up
-        |  Thanks for contacting us, we will get back to you shortly.
-      
-      
-      .form-group
-        label.col-md-4.control-label
-        .col-md-4
-          button.btn.btn-warning[type="submit"]
-            | Get Started
-            span.glyphicon.glyphicon-send

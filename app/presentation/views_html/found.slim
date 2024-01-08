@@ -5,11 +5,33 @@ html
     meta http-equiv="Content-Type" content="text/html; charset=UTF-8"
     script src="https://libs.baidu.com/jquery/1.9.0/jquery.js"
   body
-    h3 Animal Image
-    form name="form0" action="found" id="form0" enctype="multipart/form-data"
+    legend
+      | Upload the lost animal picture and recommend some vets for you !!
+
+    form name="form0" action="/finder/recommend-vets" method="post" id="form0" enctype="multipart/form-data"
+      label for="picture_description" Where do you find this cat(dog) ?
+      input type="text" name="location" id="location" placeholder="eg:台積館"
+      br
+      br
+
+      label for="county" Which county do you stop by?
+      input type="text" name="county" id="county" placeholder="eg:新竹"
+      br
+      br
+
+      label for="top_n_vets" How many results of hospitals?
+      input type="text" name="number" id="number" placeholder="eg:3"
+      br
+      br
+      label for="distance" how far are the vets you want to search for(meters)?
+      input type="text" name="distance" id="distance" placeholder="eg:3000"
+      br
+      br
       input type="file" name="file0" id="file0" multiple="multiple"
       br
+      br
       img src="" id="img0"
+<<<<<<< HEAD
 
       label for="picture_description" Found Location:
       input type="text" name="picture_description" id="picture_description"
@@ -78,3 +100,9 @@ html
                 .card-content  
                   img[src="#{obj}" class="img-thumbnail" alt="Cinque Terre" width = 200 height = 200]
 
+=======
+      br
+      br
+      button.btn.btn-secondary[type="submit"]
+        | Submit
+>>>>>>> 67cc81289086bc206cbbe1bfa0898a37fc902924

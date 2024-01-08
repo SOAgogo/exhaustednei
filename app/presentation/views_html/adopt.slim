@@ -1,161 +1,80 @@
-.formbar-wrap
-  .row
-    .col-lg-3
-      .form-group
-        |  Please Search your data
-    .col-lg-8
-      .row
-        .col-sm-12[style="text-align:left;"]
+doctype html
+html[lang="en"]
+  head
+    meta[charset="UTF-8"]
+    meta[name="viewport" content="width=device-width, initial-scale=1.0"]
+    link[href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"]
+    title
+      | FindYourMaster
+    style
+      | .attribute-container { display: flex; justify-content: space-between; margin-bottom: 1rem; }
+  body
+    .container
+      form#contact_form.well.form-horizontal[action="/promote-user-animals" method="post"]
+        fieldset
+          .p
+            | Search the most matching animal
+          
+          br
+          .p 
+            | Change the ratio of preference
+          br
           .form-group
-            #chk_0.form-check.form-check-inline
-              label.form-check-label
-                input#radPetType0.form-check-input[data-sval="0" type="radio" name="exampleRadios1" value="0"]
-                | Dog 
-                span.circle
-                  span.check
-            #chk_1.form-check.form-check-inline
-              label.form-check-label
-                input#radPetType1.form-check-input[data-sval="1" type="radio" name="exampleRadios1" value="1"]
-                | Cat
-                span.circle
-                  span.check
-            #chk_O.form-check.form-check-inline
-              label.form-check-label
-                input#radPetTypeO.form-check-input[data-sval="O" type="radio" name="exampleRadios1" value="O"]
-                | Others 
-                span.circle
-                  span.check
-            select#cobVariety.form-select[name="form-select"]
-              option[value="" selected=""]
-                | Other species
-      span.bmd-form-group
-        input#txtKeyWord.form-control[type="text" style="display: none" placeholder="IDcard/Features/Lossing time/Lossing location"]
-  .row
-    .col-lg-1
+            .row
+              .col-12
+                .form-group
+                  #attributeContainer.attribute-container
+                    .form-check
+                      label.form-check-label[for="age"]
+                        | Age
+                      input#attribute2.form-control.attribute-input[type="number" value="0.1" min="0" max="1" step="0.05" name="age"]
+                    .form-check
+                      label.form-check-label[for="sterilized"]
+                        | Sterilized 
+                      input#attribute3.form-control.attribute-input[type="number" value="0.1" min="0" max="1" step="0.05" name="sterilized"]
+                    .form-check
+                      label.form-check-label[for="bodytype"]
+                        | Bodytype
+                      input#attribute4.form-control.attribute-input[type="number" value="0.1" min="0" max="1" step="0.05" name="bodytype"]
+                    .form-check
+                      label.form-check-label[for="sex"]
+                        | Sex
+                      input#attribute5.form-control.attribute-input[type="number" value="0.1" min="0" max="1" step="0.05" name="sex"]
+                    .form-check
+                      label.form-check-label[for="vaccinated"]
+                        | Vaccinated
+                      input#attribute6.form-control.attribute-input[type="number" value="0.1" min="0" max="1" step="0.05" name="vaccinated"]
+                    .form-check
+                      label.form-check-label[for="species"]
+                        | Species
+                      input#attribute7.form-control.attribute-input[type="number" value="0.1" min="0" max="1" step="0.05" name="species"]
+                    .form-check
+                      label.form-check-label[for="color"]
+                        | Color
+                      input#attribute8.form-control.attribute-input[type="number" value="0.1" min="0" max="1" step="0.05" name="color"]
+                p#sumMessage
 
-    .col-lg-10
-      .row
-        .form-inline.col-lg-5
           .form-group
-            .form-label
-              | the county where the shelter is located
-              select#sel_County.form-select[name="form-select" data-gtm-form-interact-field-id="0"]
-                option[value=""]
-                  | County
-                option[value="A"]
-                  | 新北市
-                option[value="V"]
-                  | 臺北市
-                option[value="S"]
-                  | 臺中市
-                option[value="U"]
-                  | 臺南市
-                option[value="W"]
-                  | 高雄市
-                option[value="C"]
-                  | 桃園市
-                option[value="B"]
-                  | 宜蘭縣
-                option[value="D"]
-                  | 新竹縣
-                option[value="E"]
-                  | 苗栗縣
-                option[value="G"]
-                  | 彰化縣
-                option[value="H"]
-                  | 南投縣
-                option[value="I"]
-                  | 雲林縣
-                option[value="J"]
-                  | 嘉義縣
-                option[value="M"]
-                  | 屏東縣
-                option[value="N"]
-                  | 臺東縣
-                option[value="O"]
-                  | 花蓮縣
-                option[value="P"]
-                  | 澎湖縣
-                option[value="Q"]
-                  | 基隆市
-                option[value="R"]
-                  | 新竹市
-                option[value="T"]
-                  | 嘉義市
-                option[value="Y"]
-                  | 金門縣
-                option[value="X"]
-                  | 連江縣
-        .form-inline.col-lg-5
-          .form-group
-            .form-label
-              | Shelter 
-              select#sel_shelter.form-select[name="form-select"]
-                option[value=""]
-                  | -- Choose Shelters --
-                option[value="AAAAG"]
-                  | 新北市政府動物保護防疫處
-                option[value="AAACG"]
-                  | 新北市新店區公立動物之家
-                option[value="AAADG"]
-                  | 新北市板橋區公立動物之家
-                option[value="AAAEG"]
-                  | 新北市中和區公立動物之家
-                option[value="AAAFG"]
-                  | 新北市淡水區公立動物之家
-                option[value="AAAGG"]
-                  | 新北市瑞芳區公立動物之家
-                option[value="AAAHG"]
-                  | 新北市五股區公立動物之家
-                option[value="AAAIG"]
-                  | 新北市八里區公立動物之家
-                option[value="AAAJG"]
-                  | 新北市三芝區公立動物之家
-      .row
-        .form-inline.col-lg-5
-          .form-group
-            .form-label
-              | Animal Sex  
-              select#cobSex.form-select[name="form-select"]
-                option[value="" selected=""]
-                  | Sex
-                option[value="1" selected=""]
-                  | Male
-                option[value="0" selected=""]
-                  | Female
-        .form-inline.col-lg-5
-          .form-group
-            .form-label
-              | Age 
-              select#cobAge.form-select[name="form-select"]
-                option[value="" selected=""]
-                  | Choose Age 
-                option[value="1"]
-                  | young
-                option[value="8"]
-                  | medium
-                option[value="9"]
-                  | older
-                option[value="7"]
-                  | elder
-      .row
-        .form-inline.col-lg-5
-          .form-group
-            |  Color 
-          .form-group.bmd-form-group
-            input#txtHAIRCOLOR.form-control[type="text" placeholder="Color" maxlength="10"]
-      .row
-        .form-inline.col-lg-5.ACS
-          .form-group
-            .form-label
-              | AdoptedID
-          .form-group.bmd-form-group
-            input#txtAcNum.form-control[type="text" placeholder="AdoptedID"]
-        .form-inline.col-lg-5
-          .form-group
-            |  Animal ID no.
-          .form-group.bmd-form-group
-            input#txtCNum.form-control[type="text" placeholder="Animal ID no."]
-        .col-lg-2
-          input#SelData.btn.btn-round.btn-success.btn-sm[type="button" onclick="QueryData()" value="lookup"]
-    .col-lg-1
+            .row
+              .col-12
+                .form-group
+                  #attributeContainer.attribute-container
+                    .form-check
+                      label.form-check-label[for="age"]
+                        | choose how many animals results you want to get
+                      input#attribute2.form-control.attribute-input[type="number" value="1" min="1" max="100" step="1" name="top"]
+                p#sumMessage
+                br 
+                .form-group
+                  label.col-md-6.control-label
+                  .col-md-6.form-check-inline
+                    button.btn.btn-secondary[type="submit"]
+                      | Submit
+                    span.glyphicon.glyphicon-send
+
+          
+
+    script[src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"]
+    script[src="https://code.jquery.com/jquery-3.6.4.min.js"]
+    script
+      | $(document).ready(function() { // Attach event listener to input fields $('.attribute-input').on('input', function() { updateSum(); }); // Initial sum update updateSum(); function updateSum() { let sum = 0; // Iterate through each input field and update the sum $('.attribute-input').each(function() { sum += parseFloat($(this).val()) || 0; }); // If the sum exceeds 1, normalize the values if (sum > 1) { normalizeValues(); sum = 1; } // Update the sum message $('#sumMessage').text(`Sum of attributes: ${sum.toFixed(1)}`); } function normalizeValues() { // Normalize values to ensure the total sum is 1 const total = $('.attribute-input').toArray().reduce((acc, el) => acc + parseFloat(el.value) || 0, 0); const factor = 1 / total; $('.attribute-input').each(function() { const normalizedValue = (parseFloat($(this).val()) || 0) * factor; $(this).val(normalizedValue.toFixed(1)); }); } });

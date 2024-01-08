@@ -7,14 +7,17 @@ module PetAdoption
     # Form validation for Github project URL
     class UserDataValidator < Dry::Validation::Contract
       params do
-        required(:session_id).filled(:string)
-        required(:firstname).filled(:string)
-        required(:lastname).filled(:string)
-        required(:email).filled
-        required(:phone).filled
+        required(:name).filled(:string)
+        required(:email).filled(:string)
+        required(:phone).filled(:string)
         required(:address).filled(:string)
-        required(:state).filled(:string)
-        required(:comment).filled(:string)
+        required(:age).filled(:string)
+        required(:sex).filled(:string)
+        required(:sterilized).filled(:string)
+        required(:vaccinated).filled(:string)
+        required(:bodytype).filled(:string)
+        required(:species).filled(:string)
+        required(:color).filled(:string)
       end
 
       EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
@@ -33,10 +36,28 @@ module PetAdoption
         key.failure('must contain 路(街)') unless value.include?('路') || value.include?('街')
         key.failure('must contain 號') unless value.include?('號')
       end
-      rule(:state) do
-        unless value.include?('keeper') || value.include?('donater') || value.include?('adopter')
-          key.failure('must be one of these three values: keeper,donater,adopter')
-        end
+
+      rule(:age) do
+        key.failure('must be CHILD or ADULT') unless value == 'CHILD' || value == 'ADULT'
+      end
+
+      rule(:sterilized) do
+        key.failure('must be yes or no') unless value == 'yes' || value == 'no'
+      end
+
+      rule(:vaccinated) do
+        key.failure('must be yes or no') unless value == 'yes' || value == 'no'
+      end
+      rule(:bodytype) do
+        key.failure('must be SMALL or MEDIUM or LARGE') unless value == 'SMALL' || value == 'MEDIUM' || value == 'LARGE'
+      end
+
+      rule(:sex) do
+        key.failure('must be GIRL or BOY') unless value == 'M' || value == 'F'
+      end
+
+      rule(:color) do
+        key.failure('must be Chinese') unless value =~ /\p{Han}/
       end
     end
 
@@ -53,7 +74,7 @@ module PetAdoption
 
       def self.error_message(list_value, string)
         list_value.map do |value|
-          string += " #{value} \t"
+          string += " #{value}"
         end
         string
       end

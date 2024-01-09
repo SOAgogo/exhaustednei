@@ -7,7 +7,8 @@ ruby File.read('.ruby-version').strip
 gem 'figaro', '~> 1.2'
 gem 'pry'
 gem 'rake', '~> 13.0'
-gem 'libxml-ruby', '~> 3.1'
+gem 'libxml-ruby'
+gem 'faye', '~> 1'
 
 # PRESENTATION LAYER
 gem 'slim', '~> 5.0'
@@ -75,6 +76,3 @@ group :development do
   gem 'rerun', '~> 0.0'
   gem 'rubocop', '~> 1.0'
 end
-
-
-gem  'aws-sdk-s3'

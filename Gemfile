@@ -8,6 +8,9 @@ gem 'figaro', '~> 1.2'
 gem 'pry'
 gem 'rake', '~> 13.0'
 gem 'libxml-ruby'
+
+# WORKERS
+gem 'shoryuken', '~> 4'
 gem 'faye', '~> 1'
 
 # PRESENTATION LAYER

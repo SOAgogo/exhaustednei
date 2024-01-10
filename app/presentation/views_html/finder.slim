@@ -1,17 +1,50 @@
-h3
-  | Animal hospitals and clinics
-  small.text-muted
-    | with take-care instructions of the animal
-.row
-  .col
-    div id="map" data-location="#{location_data.clinics.to_json}" style="width: 700px; height: 500px;"
-  .col 
-    br 
-    p
-      button.btn.btn-primary[type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample" color="gray"]
-        |  How to take care of the animal?
-    #collapseExample.collapse
-      .card.card-body
-        |  #{instructions.instruction}
+.container
+  - if processing.in_progress?
+    .progress
+      .progress-bar.bg-success.progress-bar-striped.active[
+        role="progressbar" aria-valuenow="10" aria-valuemin="0"
+        aria-valuemax="100" style="width:0%"
+      ]
+    script.
+      var bar = document.getElementsByClassName("progress-bar")[0];
+      var reg = /\:(\d+)%/;
 
-== assets([:js, :map])
+      // Simulated function to update the progress bar
+      function simulateProgress() {
+        // Simulate progress update, you can adjust this value
+        var simulatedProgress = Math.min(parseInt(bar.getAttribute("aria-valuenow")) + 10, 100);
+
+        // Update progress bar and percentage
+        bar.setAttribute("aria-valuenow", simulatedProgress);
+        bar.setAttribute("style", "width:" + simulatedProgress + "%");
+        bar.innerHTML = simulatedProgress + "%";
+
+        // Reload page at 100%
+        if (simulatedProgress === 100) {
+          setTimeout(function () {
+            window.location = window.location.href;
+          }, 1000);
+        }
+      }
+
+      // Simulate progress update every 2 seconds (adjust as needed)
+      setInterval(simulateProgress, 2000);
+- else
+
+  h3
+    | Animal hospitals and clinics
+    small.text-muted
+      | with take-care instructions of the animal
+  .row
+    .col
+      div id="map" data-location="#{location_data.clinics.to_json}" style="width: 700px; height: 500px;"
+    .col 
+      br 
+      p
+        button.btn.btn-primary[type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample" color="gray"]
+          |  How to take care of the animal?
+      #collapseExample.collapse
+        .card.card-body
+          |  #{instructions.instruction}
+
+  == assets([:js, :map])

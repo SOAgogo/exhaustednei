@@ -162,7 +162,23 @@ module PetAdoption
         instructions = PetAdoption::Views::TakeCareInfo.new(res)
         location_data = PetAdoption::Views::Clinic.new(res)
 
-        view 'finder', locals: { location_data:, instructions: }
+        if instructions.response.processing?
+          puts 'app, app.rb, episode processing'
+
+          flash.now[:notice] = 'Finder Instructions is being analyzed'
+
+          processing = Views::GptProcessing.new(
+            App.config, instructions.response
+          )
+
+
+          puts "processing: #{processing.inspect}"
+          view 'finder', locals: { information: , instructions:, processing: }
+
+        else
+          view 'finder', locals: { location_data:, instructions:}
+        end
+    
       rescue StandardError
         flash[:error] = 'Could not find the vets. Please try again.'
         routing.redirect '/found'
@@ -214,10 +230,11 @@ module PetAdoption
 
         information = PetAdoption::Views::LossingPets.new(res.value!)
 
+
         view 'keeper', locals: { information: }
       rescue StandardError
-        flash[:error] = 'Sorry, in this moment, there is no lossing pet nearby you'
-        routing.redirect '/missing'
+          flash[:error] = 'Sorry, in this moment, there is no lossing pet nearby you'
+          routing.redirect '/missing'
       end
     end
   end

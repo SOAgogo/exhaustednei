@@ -1,73 +1,37 @@
-.container
-  - if processing.in_progress?
-    .progress
-      .progress-bar.bg-success.progress-bar-striped.active[
-        role="progressbar" aria-valuenow="10" aria-valuemin="0"
-        aria-valuemax="100" style="width:0%"
-      ]
-    script.
-      var bar = document.getElementsByClassName("progress-bar")[0];
-      var reg = /\:(\d+)%/;
+doctype html
+html
+  head
+    title Image preview on realtime
+    meta http-equiv="Content-Type" content="text/html; charset=UTF-8"
+    script src="https://libs.baidu.com/jquery/1.9.0/jquery.js"
+  body
+    legend
+      | Upload the lost animal picture and recommend some vets for you !!
 
-      // Simulated function to update the progress bar
-      function simulateProgress() {
-        // Simulate progress update, you can adjust this value
-        var simulatedProgress = Math.min(parseInt(bar.getAttribute("aria-valuenow")) + 10, 100);
+    form name="form0" action="/finder/recommend-vets" method="post" id="form0" enctype="multipart/form-data"
+      label for="picture_description" Where do you find this cat(dog) ?
+      input type="text" name="location" id="location" placeholder="eg:台積館"
+      br
+      br
 
-        // Update progress bar and percentage
-        bar.setAttribute("aria-valuenow", simulatedProgress);
-        bar.setAttribute("style", "width:" + simulatedProgress + "%");
-        bar.innerHTML = simulatedProgress + "%";
+      label for="county" Which county do you stop by?
+      input type="text" name="county" id="county" placeholder="eg:新竹"
+      br
+      br
 
-        // Reload page at 100%
-        if (simulatedProgress === 100) {
-          setTimeout(function () {
-            window.location = window.location.href;
-          }, 1000);
-        }
-      }
-
-      // Simulate progress update every 2 seconds (adjust as needed)
-      setInterval(simulateProgress, 2000);
-
-  doctype html
-  html
-    head
-      title Image preview on realtime
-      meta http-equiv="Content-Type" content="text/html; charset=UTF-8"
-      script src="https://libs.baidu.com/jquery/1.9.0/jquery.js"
-    body
-      legend
-        | Upload the lost animal picture and recommend some vets for you !!
-
-      form name="form0" action="/finder/recommend-vets" method="post" id="form0" enctype="multipart/form-data"
-        label for="picture_description" Where do you find this cat(dog) ?
-        input type="text" name="location" id="location" placeholder="eg:台積館"
-        br
-        br
-
-        label for="county" Which county do you stop by?
-        input type="text" name="county" id="county" placeholder="eg:新竹"
-        br
-        br
-
-        label for="top_n_vets" How many results of hospitals?
-        input type="text" name="number" id="number" placeholder="eg:3"
-        br
-        br
-        label for="distance" how far are the vets you want to search for(meters)?
-        input type="text" name="distance" id="distance" placeholder="eg:3000"
-        br
-        br
-        input type="file" name="file0" id="file0" multiple="multiple"
-        br
-        br
-        img src="" id="img0"
-
-        label for="picture_description" Found Location:
-        input type="text" name="picture_description" id="picture_description"
-
-        label for="animal_description" Picture Description:
-        input type="text" name="animal_description" id="animal_description"
-
-        button type="button" id="submitBtn" onclick="submitForm()">Submit
+      label for="top_n_vets" How many results of hospitals?
+      input type="text" name="number" id="number" placeholder="eg:3"
+      br
+      br
+      label for="distance" how far are the vets you want to search for(meters)?
+      input type="text" name="distance" id="distance" placeholder="eg:3000"
+      br
+      br
+      input type="file" name="file0" id="file0" multiple="multiple"
+      br
+      br
+      img src="" id="img0"
+      br
+      br
+      button.btn.btn-secondary[type="submit"]
+        | Submit

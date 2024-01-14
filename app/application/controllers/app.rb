@@ -32,9 +32,6 @@ module PetAdoption
 
     # use Rack::MethodOverride
 
-    plugin :indifferent_params
-
-
     route do |routing|
       routing.assets # load CSS
       response['Content-Type'] = 'text/html; charset=utf-8'
@@ -145,43 +142,31 @@ module PetAdoption
         view 'found'
       end
 
-      routing.post 'finder/recommend-vets' do
-        uploaded_file = routing.params['file0'][:tempfile].path if routing.params['file0'].is_a?(Hash)
-        selected_keys = %w[name email phone]
-        finder_info = session[:watching].slice(*selected_keys)
-        finder_info['county'] = routing.params['county']
-        finder_info['location'] = routing.params['location']
-        finder_info['file'] = uploaded_file
-        finder_info['distance'] = routing.params['distance']
-        finder_info['number'] = routing.params['number']
+      routing.on 'finder/recommend-vets' do
+        routing.post do
+          uploaded_file = routing.params['file0'][:tempfile].path if routing.params['file0'].is_a?(Hash)
+          selected_keys = %w[name email phone]
+          finder_info = session[:watching].slice(*selected_keys)
+          finder_info['county'] = routing.params['county']
+          finder_info['location'] = routing.params['location']
+          finder_info['file'] = uploaded_file
+          finder_info['distance'] = routing.params['distance']
+          finder_info['number'] = routing.params['number']
 
-        finder_preference = Forms::FinderInputsValidator.new.call(finder_info)
+          finder_preference = Forms::FinderInputsValidator.new.call(finder_info)
 
-        res = Services::FinderUploadImages.new.call(finder_preference)
+          res = Services::FinderUploadImages.new.call(finder_preference)
 
-        instructions = PetAdoption::Views::TakeCareInfo.new(res)
-        location_data = PetAdoption::Views::Clinic.new(res)
+          instructions = PetAdoption::Views::TakeCareInfo.new(res)
+          location_data = PetAdoption::Views::Clinic.new(res)
 
-        if instructions.response.processing?
-          puts 'app, app.rb, episode processing'
-
-          flash.now[:notice] = 'Finder Instructions is being analyzed'
-
-          processing = Views::GptProcessing.new(
-            App.config, instructions.response
-          )
-
-
-          puts "processing: #{processing.inspect}"
-          view 'finder', locals: { information: , instructions:, processing: }
-
-        else
-          view 'finder', locals: { location_data:, instructions:}
+          view 'finder', locals: { location_data:, instructions: }
+        rescue StandardError
+          flash[:error] = 'Could not find the vets. Please try again.'
+          routing.redirect '/found'
         end
-    
-      rescue StandardError
-        flash[:error] = 'Could not find the vets. Please try again.'
-        routing.redirect '/found'
+        # routing.get do
+
       end
 
       routing.on 'adopt' do
@@ -207,8 +192,6 @@ module PetAdoption
         view 'recommendation', locals: { output: output_view }
       end
 
-
-
       routing.on 'missing' do
         view 'missing'
       end
@@ -230,11 +213,10 @@ module PetAdoption
 
         information = PetAdoption::Views::LossingPets.new(res.value!)
 
-
         view 'keeper', locals: { information: }
       rescue StandardError
-          flash[:error] = 'Sorry, in this moment, there is no lossing pet nearby you'
-          routing.redirect '/missing'
+        flash[:error] = 'Sorry, in this moment, there is no lossing pet nearby you'
+        routing.redirect '/missing' 
       end
     end
   end

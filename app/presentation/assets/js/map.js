@@ -13,8 +13,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
+
+
 async function initMap(locationData) {
   console.log(locationData);
+
   // Request needed libraries.
   const { Map, InfoWindow } = await google.maps.importLibrary("maps");
 
@@ -24,15 +27,15 @@ async function initMap(locationData) {
     mapTypeId: google.maps.MapTypeId.ROADMAP
   });
 
+  const infoWindow = new InfoWindow(); // Create a single InfoWindow instance
 
   // Initial size of the marker icon
   const initialSize = new google.maps.Size(35, 35);
-  
 
   locationData.forEach((stop, i) => {
     console.log(stop);
     const marker = new google.maps.Marker({
-      position: {lat:stop.latitude, lng:stop.longitude},
+      position: { lat: stop.latitude, lng: stop.longitude },
       map,
       icon: {
         url: 'https://soapicture.s3.ap-northeast-2.amazonaws.com/uploadsspec/test_s3_upload_image/veterinarian.png',
@@ -47,29 +50,33 @@ async function initMap(locationData) {
         <div>Road: ${stop.which_road}</div>
       `,
     });
-  
+
     // Add a click event listener to display the title and content with newline when the marker is clicked
     google.maps.event.addListener(marker, 'click', function () {
-      const infoWindow = new google.maps.InfoWindow({
-        content:`<div><strong>${marker.title}</strong></div><div>${marker.content.replace(/\n/g, '<br>')}</div>`,
-      });
+      // Set content and open the existing infoWindow
+      infoWindow.setContent(`<div><strong>${marker.title}</strong></div><div>${marker.content.replace(/\n/g, '<br>')}</div>`);
       infoWindow.open(map, marker);
     });
+  });
 
-    google.maps.event.addListener(map, 'zoom_changed', function () {
-      // Get the current zoom level
-      const zoomLevel = map.getZoom();
-      
-    
-      // Calculate the new size based on the zoom level
-      const newWidth = initialSize.width * zoomLevel;
-      const newHeight = initialSize.height * zoomLevel;
-    
-      // Update the scaledSize property of the marker's icon
-      marker.setIcon({
-        ...marker.getIcon(),
-        scaledSize: new google.maps.Size(newWidth, newHeight),
-      });
+  google.maps.event.addListener(map, 'zoom_changed', function () {
+    // Get the current zoom level
+    const zoomLevel = map.getZoom();
+
+    // Iterate through markers and update their scaledSize
+    locationData.forEach((stop, i) => {
+      const marker = map.markers[i];
+      if (marker) {
+        // Calculate the new size based on the zoom level
+        const newWidth = initialSize.width * zoomLevel;
+        const newHeight = initialSize.height * zoomLevel;
+
+        // Update the scaledSize property of the marker's icon
+        marker.setIcon({
+          ...marker.getIcon(),
+          scaledSize: new google.maps.Size(newWidth, newHeight),
+        });
+      }
     });
   });
 }

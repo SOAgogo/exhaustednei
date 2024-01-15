@@ -139,7 +139,8 @@ module PetAdoption
       end
 
       routing.on 'found' do
-        view 'found'
+        processing = nil
+        view 'found', locals: { processing: }
       end
 
       routing.on 'finder/recommend-vets' do
@@ -156,17 +157,27 @@ module PetAdoption
           finder_preference = Forms::FinderInputsValidator.new.call(finder_info)
 
           res = Services::FinderUploadImages.new.call(finder_preference)
+          pets = OpenStruct.new(res.value!)
 
-          instructions = PetAdoption::Views::TakeCareInfo.new(res)
-          location_data = PetAdoption::Views::Clinic.new(res)
+          http_rep = Representer::HttpResponse.new(OpenStruct.new).from_json(pets.response.payload)
+          processing = Views::PetFindingProcessing.new(App.config, http_rep)
 
-          view 'finder', locals: { location_data:, instructions: }
+          flash.now[:notice] = 'Still looking for your vets, please wait a moment' if http_rep.status == 'processing'
+
+          # instructions = PetAdoption::Views::TakeCareInfo.new(res)
+          # location_data = PetAdoption::Views::Clinic.new(res)
+          view 'found', locals: { processing: }
         rescue StandardError
           flash[:error] = 'Could not find the vets. Please try again.'
           routing.redirect '/found'
         end
-        # routing.get do
+        routing.get do
+          res = Services::FinderGetResults.new.call
+          instructions = PetAdoption::Views::TakeCareInfo.new(res)
+          location_data = PetAdoption::Views::Clinic.new(res)
 
+          view 'finder', locals: { location_data:, instructions: }
+        end
       end
 
       routing.on 'adopt' do

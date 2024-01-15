@@ -10,7 +10,7 @@ module PetAdoption
       step :validate_input
       step :upload_image
       step :find_the_vets
-      step :reify_vets
+      # step :reify_vets
 
       private
 
@@ -40,20 +40,26 @@ module PetAdoption
       end
 
       def find_the_vets(input)
-        res = PetAdoption::Gateway::Api.new(PetAdoption::App.config).recommend_some_vets(input[:input])
-        # puts 'vets can be found here'
-        Success(res)
+        input[:response] = PetAdoption::Gateway::Api.new(PetAdoption::App.config).recommend_some_vets(input[:input])
+        http_presenter = Representer::HttpResponse.new(OpenStruct.new).from_json(input[:response].payload)
+        http_presenter.status == 'processing' ? Success(input) : Failure(http_presenter.message)
       rescue StandardError
         Failure('Sorry, in this moment, there is no vet nearby you')
       end
 
-      def reify_vets(results)
-        vets = Representer::VetRecommeandation.new(OpenStruct.new).from_json(results.payload)
-        # puts 'vets can be created here'
-        Success(vets)
-      rescue StandardError
-        Failure('Error in parsing vets')
-      end
+      # def reify_vets(input)
+      #   unless input[:response].processing?
+      #     Representer::VetRecommeandation.new(OpenStruct.new).from_json(results.payload)
+      #       # .then { |vets| Success(vets) }
+      #       .then { input[:vets] = _1 }
+      #   end
+      #   Success(input)
+      #   # puts 'vets can be created here'
+      # rescue StandardError
+      #   Failure('Error in parsing vets')
+      # end
     end
+
+    # FinderGetResults
   end
 end
